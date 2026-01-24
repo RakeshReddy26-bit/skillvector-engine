@@ -1,0 +1,20 @@
+[
+  {
+    "id": "job-1",
+    "title": "Backend Engineer",
+    "company": "Acme Corp",
+    "description": "Backend engineer with Python, Django, REST APIs, Docker, and PostgreSQL."
+  },
+  {
+    "id": "job-2",
+    "title": "Software Engineer",
+    "company": "TechNova",
+    "description": "Software engineer skilled in Python, cloud services, CI/CD, and containerization."
+  },
+  {
+    "id": "job-3",
+    "title": "Python Developer",
+    "company": "DataWorks",
+    "description": "Python developer with API design, databases, and scalable backend systems."
+  }
+]
