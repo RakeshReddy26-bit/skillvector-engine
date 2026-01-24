@@ -10,3 +10,5 @@ skillvector/
 
 # OS files
 .DS_Store
+# Local debug tests
+src/test_gap_agent.py
