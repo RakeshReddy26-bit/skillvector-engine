@@ -1,49 +1,49 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+import json
 
 
 class SkillGapAgent:
-    """
-    Uses an LLM to identify missing skills between
-    a resume and a job description.
-    """
-
     def __init__(self):
         self.llm = ChatOpenAI(
-            model="gpt-4o",
-            temperature=0.2
+            temperature=0,
+            model="gpt-4o-mini"
         )
 
-        self.prompt = ChatPromptTemplate.from_messages([
-            (
-                "system",
-                "You are a senior technical recruiter and curriculum architect."
-            ),
-            (
-                "human",
-                """
-Compare the following resume and job description.
+        self.prompt = ChatPromptTemplate.from_template(
+            """
+You are a senior technical recruiter.
 
-Resume:
+Compare the RESUME and JOB DESCRIPTION.
+
+Return JSON ONLY in this exact format:
+
+{{
+  "match_score": number,
+  "priority": "Low" | "Medium" | "High",
+  "missing_skills": [list of strings]
+}}
+
+RESUME:
 {resume}
 
-Job Description:
+JOB DESCRIPTION:
 {job}
-
-Identify ONLY the skills required by the job that are NOT clearly present in the resume.
-
-Return JSON ONLY in this format:
-{{
-  "missing_skills": ["skill1", "skill2"]
-}}
 """
-            )
-        ])
+        )
 
-        self.parser = JsonOutputParser()
+    def run(self, resume_text: str, job_text: str) -> dict:
+        chain = self.prompt | self.llm
+        response = chain.invoke({
+            "resume": resume_text,
+            "job": job_text
+        })
 
-    def find_missing_skills(self, resume: str, job: str) -> list[str]:
-        chain = self.prompt | self.llm | self.parser
-        result = chain.invoke({"resume": resume, "job": job})
-        return result.get("missing_skills", [])
+        try:
+            return json.loads(response.content)
+        except Exception:
+            return {
+                "match_score": 50,
+                "priority": "Medium",
+                "missing_skills": []
+            }

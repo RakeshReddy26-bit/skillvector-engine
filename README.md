@@ -1,22 +1,51 @@
-# SkillVector Engine 🚀
+# SkillVector
 
-SkillVector is an AI-powered Career Architecture platform designed to
-bridge the gap between a user's current skills and real-world job requirements
-using semantic intelligence.
+SkillVector is an experimental engine that turns resumes and job descriptions into **clear skill gaps, learning paths, and real proof of ability**.
 
-## Vision
-To make career guidance personalized, data-driven, and globally accessible.
+The goal is simple:  
+stop guessing skills from resumes and start working with evidence.
 
-## Core Idea
-- Semantic skill matching (not keyword matching)
-- AI-driven skill gap analysis
-- Future-ready learning path generation
+This project is early, opinionated, and built step by step as a real system — not a demo.
 
-## Architecture (High-Level)
-- Resume & Job Description → Embeddings
-- Cosine Similarity → Match Score
-- LLM Reasoning → Missing Skills
-- Knowledge Graph (future) → Learning Order
+---
 
-## Status
-🚧 Phase 1: Skill Gap Engine (In Progress)
+## Why This Exists
+
+Hiring today relies too much on weak signals:
+- resumes full of keywords
+- vague skill claims
+- subjective interviews
+- inconsistent evaluations
+
+On the other side, candidates don’t know:
+- what skills they’re actually missing
+- what to learn next
+- how to prove what they know in a way hiring managers trust
+
+SkillVector sits in the middle.
+
+It asks:
+> “What skills does this role really need, what does this person actually have, and what proof would convince someone?”
+
+---
+
+## What SkillVector Does (Today)
+
+Given:
+- a resume (plain text)
+- a target job description
+
+SkillVector produces:
+- a match score
+- a learning priority
+- missing skills
+- an ordered learning path
+- concrete project-based evidence ideas
+
+Everything is structured, inspectable, and designed to evolve.
+
+---
+
+## How the System Works
+
+At a high level:
