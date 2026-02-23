@@ -44,7 +44,7 @@ if os.getenv("RENDER") and "cold_start_dismissed" not in st.session_state:
     st.info(
         "This app runs on a free server that sleeps after 15 min of inactivity. "
         "First load may take ~30 seconds. Thanks for your patience!",
-        icon="snowflake",
+        icon="\u2744",
     )
     st.session_state["cold_start_dismissed"] = True
 
