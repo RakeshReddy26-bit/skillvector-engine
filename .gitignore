@@ -20,6 +20,8 @@ Thumbs.db
 
 # Database
 data/*.db
+data/*.db-shm
+data/*.db-wal
 
 # Streamlit secrets
 .streamlit/secrets.toml
