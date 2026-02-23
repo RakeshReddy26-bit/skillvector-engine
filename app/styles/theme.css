@@ -1,0 +1,564 @@
+/* SkillVector Engine — Modern Dark Theme
+   Injected via st.markdown() on every page load.
+   Color Palette:
+     Primary    #4F8BF9
+     Secondary  #6C63FF
+     Success    #00C48C
+     Warning    #FFB800
+     Error      #FF4D4D
+     Dark BG    #0E1117
+     Card BG    #1E2329
+     Border     #2D333B
+     Muted Text #8B949E
+*/
+
+/* ── Global Typography ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Hide Streamlit defaults ───────────────────────────────────────────── */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header[data-testid="stHeader"] {
+    background: transparent;
+}
+
+/* ── Sidebar ───────────────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0E1117 0%, #161B22 100%);
+    border-right: 1px solid #2D333B;
+}
+
+[data-testid="stSidebar"] .stMarkdown h1,
+[data-testid="stSidebar"] .stMarkdown h2,
+[data-testid="stSidebar"] .stMarkdown h3 {
+    color: #FAFAFA;
+}
+
+[data-testid="stSidebar"] .stMarkdown p {
+    color: #8B949E;
+}
+
+/* ── Metric Cards ──────────────────────────────────────────────────────── */
+.metric-card {
+    background: linear-gradient(135deg, #1E2329 0%, #262D35 100%);
+    border: 1px solid #2D333B;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+}
+
+.metric-card.blue::before { background: linear-gradient(90deg, #4F8BF9, #6C63FF); }
+.metric-card.green::before { background: linear-gradient(90deg, #00C48C, #00E5A0); }
+.metric-card.orange::before { background: linear-gradient(90deg, #FFB800, #FF9500); }
+.metric-card.red::before { background: linear-gradient(90deg, #FF4D4D, #FF6B6B); }
+.metric-card.purple::before { background: linear-gradient(90deg, #6C63FF, #8B5CF6); }
+
+.metric-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #FAFAFA;
+    margin: 4px 0;
+    line-height: 1.2;
+}
+
+.metric-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8B949E;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-delta {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.metric-delta.positive { color: #00C48C; }
+.metric-delta.negative { color: #FF4D4D; }
+
+/* ── Content Cards ─────────────────────────────────────────────────────── */
+.content-card {
+    background: #1E2329;
+    border: 1px solid #2D333B;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+}
+
+.content-card h3 {
+    color: #FAFAFA;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #2D333B;
+}
+
+/* ── Section Headers ───────────────────────────────────────────────────── */
+.section-header {
+    background: linear-gradient(135deg, #1E2329 0%, #262D35 100%);
+    border: 1px solid #2D333B;
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+}
+
+.section-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FAFAFA;
+    margin: 0 0 4px 0;
+}
+
+.section-header p {
+    color: #8B949E;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ── Gradient Header ───────────────────────────────────────────────────── */
+.gradient-header {
+    background: linear-gradient(135deg, #4F8BF9 0%, #6C63FF 100%);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.gradient-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: white;
+}
+
+.gradient-header p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+    color: white;
+}
+
+/* ── Skill Chips ───────────────────────────────────────────────────────── */
+.skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.skill-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid;
+    transition: transform 0.15s ease;
+}
+
+.skill-chip:hover {
+    transform: scale(1.05);
+}
+
+.skill-chip.language { background: rgba(79, 139, 249, 0.15); color: #4F8BF9; border-color: rgba(79, 139, 249, 0.3); }
+.skill-chip.data { background: rgba(0, 196, 140, 0.15); color: #00C48C; border-color: rgba(0, 196, 140, 0.3); }
+.skill-chip.devops { background: rgba(108, 99, 255, 0.15); color: #6C63FF; border-color: rgba(108, 99, 255, 0.3); }
+.skill-chip.cloud { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; border-color: rgba(139, 92, 246, 0.3); }
+.skill-chip.architecture { background: rgba(255, 184, 0, 0.15); color: #FFB800; border-color: rgba(255, 184, 0, 0.3); }
+.skill-chip.frontend { background: rgba(236, 72, 153, 0.15); color: #EC4899; border-color: rgba(236, 72, 153, 0.3); }
+.skill-chip.framework { background: rgba(14, 165, 233, 0.15); color: #0EA5E9; border-color: rgba(14, 165, 233, 0.3); }
+.skill-chip.runtime { background: rgba(14, 165, 233, 0.15); color: #0EA5E9; border-color: rgba(14, 165, 233, 0.3); }
+.skill-chip.tool { background: rgba(156, 163, 175, 0.15); color: #9CA3AF; border-color: rgba(156, 163, 175, 0.3); }
+.skill-chip.operations { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border-color: rgba(245, 158, 11, 0.3); }
+.skill-chip.default { background: rgba(156, 163, 175, 0.15); color: #9CA3AF; border-color: rgba(156, 163, 175, 0.3); }
+
+/* ── Timeline ──────────────────────────────────────────────────────────── */
+.timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 16px 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #4F8BF9, #6C63FF);
+}
+
+.timeline-item {
+    position: relative;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    background: #1E2329;
+    border: 1px solid #2D333B;
+    border-radius: 10px;
+    transition: border-color 0.2s ease;
+}
+
+.timeline-item:hover {
+    border-color: #4F8BF9;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -33px;
+    top: 22px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4F8BF9;
+    border: 3px solid #0E1117;
+    box-shadow: 0 0 0 2px #4F8BF9;
+}
+
+.timeline-step {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4F8BF9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.timeline-skill {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FAFAFA;
+}
+
+.timeline-meta {
+    font-size: 13px;
+    color: #8B949E;
+    margin-top: 4px;
+}
+
+/* ── Progress Bar ──────────────────────────────────────────────────────── */
+.progress-container {
+    background: #2D333B;
+    border-radius: 8px;
+    height: 8px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.6s ease;
+    background: linear-gradient(90deg, #4F8BF9, #6C63FF);
+}
+
+.progress-bar.green { background: linear-gradient(90deg, #00C48C, #00E5A0); }
+.progress-bar.orange { background: linear-gradient(90deg, #FFB800, #FF9500); }
+.progress-bar.red { background: linear-gradient(90deg, #FF4D4D, #FF6B6B); }
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.badge.high { background: rgba(255, 77, 77, 0.15); color: #FF4D4D; }
+.badge.medium { background: rgba(255, 184, 0, 0.15); color: #FFB800; }
+.badge.low { background: rgba(0, 196, 140, 0.15); color: #00C48C; }
+.badge.beginner { background: rgba(0, 196, 140, 0.15); color: #00C48C; }
+.badge.intermediate { background: rgba(255, 184, 0, 0.15); color: #FFB800; }
+.badge.advanced { background: rgba(255, 77, 77, 0.15); color: #FF4D4D; }
+.badge.foundational { background: rgba(0, 196, 140, 0.15); color: #00C48C; }
+
+/* ── Styled Buttons ────────────────────────────────────────────────────── */
+.stButton > button {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 8px 24px;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #4F8BF9 0%, #6C63FF 100%);
+    color: white;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 139, 249, 0.3);
+}
+
+/* ── Expanders ─────────────────────────────────────────────────────────── */
+[data-testid="stExpander"] {
+    background: #1E2329;
+    border: 1px solid #2D333B;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+[data-testid="stExpander"]:hover {
+    border-color: #4F8BF9;
+}
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    border-bottom: 2px solid #2D333B;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px 8px 0 0;
+    padding: 12px 24px;
+    color: #8B949E;
+    font-weight: 500;
+}
+
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    color: #4F8BF9;
+    border-bottom: 2px solid #4F8BF9;
+}
+
+/* ── Data Tables ───────────────────────────────────────────────────────── */
+.styled-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #2D333B;
+}
+
+.styled-table thead th {
+    background: #262D35;
+    color: #8B949E;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #2D333B;
+}
+
+.styled-table tbody td {
+    padding: 12px 16px;
+    color: #FAFAFA;
+    font-size: 14px;
+    border-bottom: 1px solid #2D333B;
+}
+
+.styled-table tbody tr:hover {
+    background: rgba(79, 139, 249, 0.05);
+}
+
+.styled-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ── Empty State ───────────────────────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: #8B949E;
+}
+
+.empty-state .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: #FAFAFA;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #8B949E;
+    font-size: 14px;
+}
+
+/* ── Project Cards ─────────────────────────────────────────────────────── */
+.project-card {
+    background: #1E2329;
+    border: 1px solid #2D333B;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.project-card:hover {
+    border-color: #4F8BF9;
+}
+
+.project-card h4 {
+    color: #FAFAFA;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.project-card p {
+    color: #8B949E;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.project-card .deliverables {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #2D333B;
+}
+
+.project-card .deliverables li {
+    color: #FAFAFA;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+/* ── Job Cards ────────────────────────────────────────────────────────── */
+.job-card {
+    background: #1E2329;
+    border: 1px solid #2D333B;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.job-card:hover {
+    border-color: #6C63FF;
+}
+
+.job-card h4 {
+    color: #FAFAFA;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ── Feedback Widget ───────────────────────────────────────────────────── */
+.feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #2D333B;
+    background: #1E2329;
+    color: #FAFAFA;
+}
+
+.feedback-btn:hover {
+    transform: translateY(-1px);
+}
+
+.feedback-btn.positive:hover {
+    border-color: #00C48C;
+    background: rgba(0, 196, 140, 0.1);
+}
+
+.feedback-btn.negative:hover {
+    border-color: #FF4D4D;
+    background: rgba(255, 77, 77, 0.1);
+}
+
+/* ── Loading Ring ──────────────────────────────────────────────────────── */
+.loading-ring {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: 4px solid #2D333B;
+    border-top: 4px solid #4F8BF9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0E1117;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2D333B;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #444C56;
+}
+
+/* ── Plotly Chart Overrides ────────────────────────────────────────────── */
+.js-plotly-plot .plotly .main-svg {
+    border-radius: 12px;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.app-footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 48px;
+    border-top: 1px solid #2D333B;
+    color: #8B949E;
+    font-size: 12px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .metric-card { padding: 16px; }
+    .metric-value { font-size: 28px; }
+    .gradient-header { padding: 20px; }
+    .gradient-header h1 { font-size: 24px; }
+}

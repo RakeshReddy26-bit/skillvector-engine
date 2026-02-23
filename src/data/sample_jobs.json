@@ -3,18 +3,385 @@
     "id": "job-1",
     "title": "Backend Engineer",
     "company": "Acme Corp",
+    "level": "Mid",
     "description": "Backend engineer with Python, Django, REST APIs, Docker, and PostgreSQL."
   },
   {
     "id": "job-2",
     "title": "Software Engineer",
     "company": "TechNova",
+    "level": "Mid",
     "description": "Software engineer skilled in Python, cloud services, CI/CD, and containerization."
   },
   {
     "id": "job-3",
     "title": "Python Developer",
     "company": "DataWorks",
+    "level": "Mid",
     "description": "Python developer with API design, databases, and scalable backend systems."
+  },
+  {
+    "id": "job-4",
+    "title": "Junior Software Engineer",
+    "company": "StartupHub",
+    "level": "Junior",
+    "description": "Entry-level software engineer. Python, Git, SQL basics, REST APIs, unit testing."
+  },
+  {
+    "id": "job-5",
+    "title": "Junior Frontend Developer",
+    "company": "PixelCraft",
+    "level": "Junior",
+    "description": "Junior frontend developer with HTML, CSS, JavaScript, React, responsive design."
+  },
+  {
+    "id": "job-6",
+    "title": "Junior Data Analyst",
+    "company": "InsightCo",
+    "level": "Junior",
+    "description": "Data analyst with SQL, Excel, Python basics, data visualization, Tableau."
+  },
+  {
+    "id": "job-7",
+    "title": "Senior Backend Engineer",
+    "company": "ScaleForce",
+    "level": "Senior",
+    "description": "Senior backend engineer. 5+ years Python, microservices architecture, Kubernetes, CI/CD pipelines, system design, PostgreSQL, Redis, message queues."
+  },
+  {
+    "id": "job-8",
+    "title": "Senior Frontend Engineer",
+    "company": "UILabs",
+    "level": "Senior",
+    "description": "Senior frontend engineer. React, TypeScript, GraphQL, performance optimization, accessibility, design systems, state management, testing."
+  },
+  {
+    "id": "job-9",
+    "title": "Full Stack Developer",
+    "company": "WebFlow Inc",
+    "level": "Mid",
+    "description": "Full stack developer with React, Node.js, PostgreSQL, REST APIs, Docker, Git, Agile."
+  },
+  {
+    "id": "job-10",
+    "title": "DevOps Engineer",
+    "company": "CloudOps",
+    "level": "Mid",
+    "description": "DevOps engineer with Docker, Kubernetes, Terraform, CI/CD, AWS, monitoring, Linux administration."
+  },
+  {
+    "id": "job-11",
+    "title": "Senior DevOps Engineer",
+    "company": "InfraScale",
+    "level": "Senior",
+    "description": "Senior DevOps engineer. Kubernetes at scale, Terraform modules, AWS/GCP multi-cloud, service mesh, GitOps, SRE practices, incident management."
+  },
+  {
+    "id": "job-12",
+    "title": "Data Engineer",
+    "company": "DataPipe",
+    "level": "Mid",
+    "description": "Data engineer with Python, SQL, Apache Spark, Airflow, data modeling, ETL pipelines, cloud data warehouses."
+  },
+  {
+    "id": "job-13",
+    "title": "Senior Data Engineer",
+    "company": "BigData Corp",
+    "level": "Senior",
+    "description": "Senior data engineer. Spark, Kafka, Airflow, data lakehouse architecture, dbt, Snowflake, data quality frameworks, real-time streaming."
+  },
+  {
+    "id": "job-14",
+    "title": "Machine Learning Engineer",
+    "company": "ML Solutions",
+    "level": "Mid",
+    "description": "ML engineer with Python, scikit-learn, TensorFlow or PyTorch, feature engineering, model deployment, MLOps, Docker."
+  },
+  {
+    "id": "job-15",
+    "title": "Senior ML Engineer",
+    "company": "DeepTech AI",
+    "level": "Senior",
+    "description": "Senior ML engineer. Deep learning, NLP, computer vision, MLOps pipelines, model monitoring, distributed training, Kubernetes, experiment tracking."
+  },
+  {
+    "id": "job-16",
+    "title": "Cloud Architect",
+    "company": "CloudFirst",
+    "level": "Senior",
+    "description": "Cloud architect with AWS or GCP, networking, security, cost optimization, multi-region deployment, disaster recovery, well-architected framework."
+  },
+  {
+    "id": "job-17",
+    "title": "Platform Engineer",
+    "company": "PlatformCo",
+    "level": "Senior",
+    "description": "Platform engineer. Internal developer platform, Kubernetes operators, service catalog, CI/CD standards, developer experience, observability."
+  },
+  {
+    "id": "job-18",
+    "title": "Security Engineer",
+    "company": "SecureNet",
+    "level": "Mid",
+    "description": "Security engineer with application security, OWASP, penetration testing, SAST/DAST, cloud security, identity management, compliance."
+  },
+  {
+    "id": "job-19",
+    "title": "QA Engineer",
+    "company": "QualitySoft",
+    "level": "Mid",
+    "description": "QA engineer with test automation, Selenium, Cypress, API testing, performance testing, CI/CD integration, test strategy."
+  },
+  {
+    "id": "job-20",
+    "title": "Site Reliability Engineer",
+    "company": "ReliableSys",
+    "level": "Senior",
+    "description": "SRE with incident management, SLOs/SLIs, monitoring (Prometheus, Grafana), on-call, capacity planning, chaos engineering, Linux, Python."
+  },
+  {
+    "id": "job-21",
+    "title": "Mobile Developer (iOS)",
+    "company": "AppForge",
+    "level": "Mid",
+    "description": "iOS developer with Swift, SwiftUI, UIKit, Core Data, REST API integration, App Store deployment, unit testing."
+  },
+  {
+    "id": "job-22",
+    "title": "Mobile Developer (Android)",
+    "company": "DroidTech",
+    "level": "Mid",
+    "description": "Android developer with Kotlin, Jetpack Compose, MVVM, Room database, Retrofit, coroutines, Play Store deployment."
+  },
+  {
+    "id": "job-23",
+    "title": "React Native Developer",
+    "company": "CrossPlatform",
+    "level": "Mid",
+    "description": "React Native developer with TypeScript, navigation, state management, native modules, performance optimization, app deployment."
+  },
+  {
+    "id": "job-24",
+    "title": "Technical Lead",
+    "company": "LeadTech",
+    "level": "Senior",
+    "description": "Technical lead. Architecture decisions, code review, mentoring, system design, stakeholder communication, Agile, technical roadmap planning."
+  },
+  {
+    "id": "job-25",
+    "title": "Engineering Manager",
+    "company": "ManageTech",
+    "level": "Senior",
+    "description": "Engineering manager. Team leadership, hiring, performance management, project planning, stakeholder communication, technical strategy, Agile/Scrum."
+  },
+  {
+    "id": "job-26",
+    "title": "Junior DevOps Engineer",
+    "company": "CloudStart",
+    "level": "Junior",
+    "description": "Junior DevOps engineer. Linux basics, Docker, Git, basic CI/CD, scripting (Bash/Python), cloud fundamentals."
+  },
+  {
+    "id": "job-27",
+    "title": "Junior Backend Developer",
+    "company": "CodeBase",
+    "level": "Junior",
+    "description": "Junior backend developer. Python or Node.js, SQL, REST APIs, Git, unit testing, basic Docker."
+  },
+  {
+    "id": "job-28",
+    "title": "API Developer",
+    "company": "APIFirst",
+    "level": "Mid",
+    "description": "API developer with REST and GraphQL, authentication (OAuth2, JWT), API versioning, rate limiting, documentation (OpenAPI)."
+  },
+  {
+    "id": "job-29",
+    "title": "Database Administrator",
+    "company": "DataGuard",
+    "level": "Mid",
+    "description": "DBA with PostgreSQL, MySQL, database performance tuning, backup strategies, replication, migration, monitoring."
+  },
+  {
+    "id": "job-30",
+    "title": "Blockchain Developer",
+    "company": "ChainTech",
+    "level": "Mid",
+    "description": "Blockchain developer with Solidity, Ethereum, smart contracts, Web3.js, DeFi protocols, security auditing."
+  },
+  {
+    "id": "job-31",
+    "title": "Data Scientist",
+    "company": "DataSci Corp",
+    "level": "Mid",
+    "description": "Data scientist with Python, pandas, statistical analysis, machine learning, data visualization, SQL, Jupyter notebooks, A/B testing."
+  },
+  {
+    "id": "job-32",
+    "title": "Senior Data Scientist",
+    "company": "AdvancedAI",
+    "level": "Senior",
+    "description": "Senior data scientist. Deep learning, NLP, causal inference, experiment design, production ML, stakeholder communication, mentoring."
+  },
+  {
+    "id": "job-33",
+    "title": "Solutions Architect",
+    "company": "ArchDesign",
+    "level": "Senior",
+    "description": "Solutions architect with cloud architecture (AWS/Azure), integration patterns, enterprise architecture, cost optimization, technical documentation."
+  },
+  {
+    "id": "job-34",
+    "title": "Frontend Developer",
+    "company": "WebDesign Co",
+    "level": "Mid",
+    "description": "Frontend developer with React or Vue.js, TypeScript, CSS/SCSS, responsive design, accessibility, performance optimization, testing."
+  },
+  {
+    "id": "job-35",
+    "title": "Go Developer",
+    "company": "GoFast",
+    "level": "Mid",
+    "description": "Go developer with microservices, gRPC, concurrency patterns, Docker, Kubernetes, PostgreSQL, testing."
+  },
+  {
+    "id": "job-36",
+    "title": "Java Backend Developer",
+    "company": "EnterpriseSoft",
+    "level": "Mid",
+    "description": "Java developer with Spring Boot, microservices, JPA/Hibernate, REST APIs, message queues (RabbitMQ/Kafka), Docker."
+  },
+  {
+    "id": "job-37",
+    "title": "Rust Systems Engineer",
+    "company": "SystemsCore",
+    "level": "Senior",
+    "description": "Rust engineer. Systems programming, memory safety, async runtime, performance optimization, FFI, embedded systems."
+  },
+  {
+    "id": "job-38",
+    "title": "MLOps Engineer",
+    "company": "MLOps Inc",
+    "level": "Mid",
+    "description": "MLOps engineer with model deployment, CI/CD for ML, monitoring, feature stores, experiment tracking, Docker, Kubernetes, cloud ML services."
+  },
+  {
+    "id": "job-39",
+    "title": "Technical Writer",
+    "company": "DocuTech",
+    "level": "Mid",
+    "description": "Technical writer for developer tools. API documentation, tutorials, architectural guides, docs-as-code, Markdown, Git, developer empathy."
+  },
+  {
+    "id": "job-40",
+    "title": "Staff Engineer",
+    "company": "BigTech Co",
+    "level": "Staff",
+    "description": "Staff engineer. Cross-team technical leadership, system design at scale, performance engineering, mentoring, RFC process, technical vision."
+  },
+  {
+    "id": "job-41",
+    "title": "Junior Full Stack Developer",
+    "company": "LaunchPad",
+    "level": "Junior",
+    "description": "Junior full stack developer. HTML, CSS, JavaScript, React basics, Node.js, SQL, Git, willingness to learn."
+  },
+  {
+    "id": "job-42",
+    "title": "Embedded Systems Engineer",
+    "company": "IoTWorks",
+    "level": "Mid",
+    "description": "Embedded engineer with C/C++, RTOS, microcontrollers, communication protocols (I2C, SPI, UART), debugging, firmware updates."
+  },
+  {
+    "id": "job-43",
+    "title": "Network Engineer",
+    "company": "NetSecure",
+    "level": "Mid",
+    "description": "Network engineer with TCP/IP, routing/switching, firewalls, VPN, load balancers, network monitoring, security protocols."
+  },
+  {
+    "id": "job-44",
+    "title": "Senior Full Stack Engineer",
+    "company": "StackMaster",
+    "level": "Senior",
+    "description": "Senior full stack engineer. React, TypeScript, Node.js, PostgreSQL, Redis, Docker, Kubernetes, CI/CD, system design, mentoring."
+  },
+  {
+    "id": "job-45",
+    "title": "AI/ML Research Engineer",
+    "company": "ResearchLab",
+    "level": "Senior",
+    "description": "ML research engineer. Transformer architectures, fine-tuning LLMs, RAG systems, distributed training, PyTorch, paper implementation."
+  },
+  {
+    "id": "job-46",
+    "title": "Product Engineer",
+    "company": "ProductCo",
+    "level": "Mid",
+    "description": "Product engineer. Full stack (React + Python), product thinking, user empathy, A/B testing, analytics, rapid prototyping."
+  },
+  {
+    "id": "job-47",
+    "title": "Infrastructure Engineer",
+    "company": "InfraWorks",
+    "level": "Mid",
+    "description": "Infrastructure engineer with AWS/GCP, Terraform, networking, DNS, CDN, monitoring, cost optimization, automation."
+  },
+  {
+    "id": "job-48",
+    "title": "Senior Security Engineer",
+    "company": "CyberShield",
+    "level": "Senior",
+    "description": "Senior security engineer. Threat modeling, security architecture, cloud security posture management, incident response, zero trust, compliance frameworks."
+  },
+  {
+    "id": "job-49",
+    "title": "Developer Advocate",
+    "company": "DevRelCo",
+    "level": "Mid",
+    "description": "Developer advocate. Public speaking, technical writing, demo building, community engagement, SDK development, feedback loops."
+  },
+  {
+    "id": "job-50",
+    "title": "Junior QA Engineer",
+    "company": "TestFirst",
+    "level": "Junior",
+    "description": "Junior QA engineer. Manual testing, test case writing, bug reporting, basic automation (Selenium), SQL queries, Agile."
+  },
+  {
+    "id": "job-51",
+    "title": "Senior Platform Engineer",
+    "company": "PlatformX",
+    "level": "Senior",
+    "description": "Senior platform engineer. Kubernetes at scale, service mesh (Istio), GitOps (ArgoCD), developer portal, platform APIs, SRE practices."
+  },
+  {
+    "id": "job-52",
+    "title": "Data Platform Engineer",
+    "company": "DataPlat",
+    "level": "Senior",
+    "description": "Data platform engineer. Data lakehouse, Spark, Kafka, data governance, schema registry, data catalog, cost optimization, self-service analytics."
+  },
+  {
+    "id": "job-53",
+    "title": "Ruby on Rails Developer",
+    "company": "RailsShop",
+    "level": "Mid",
+    "description": "Rails developer with Ruby, ActiveRecord, PostgreSQL, Sidekiq, REST APIs, RSpec testing, Heroku/AWS deployment."
+  },
+  {
+    "id": "job-54",
+    "title": "PHP Laravel Developer",
+    "company": "WebAgency",
+    "level": "Mid",
+    "description": "Laravel developer with PHP, Eloquent ORM, MySQL, Redis, queue workers, REST APIs, PHPUnit, Docker."
+  },
+  {
+    "id": "job-55",
+    "title": "Unity Game Developer",
+    "company": "GameStudio",
+    "level": "Mid",
+    "description": "Unity developer with C#, 3D/2D game development, physics, animation, UI systems, optimization, multiplayer basics."
   }
 ]
