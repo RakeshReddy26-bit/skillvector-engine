@@ -7,10 +7,6 @@ import json
 import logging
 import os
 
-from anthropic import Anthropic
-from pinecone import Pinecone
-from sentence_transformers import SentenceTransformer
-
 logger = logging.getLogger(__name__)
 
 # Singleton model (loaded once, reused)
@@ -20,6 +16,8 @@ _model = None
 def _get_embedding_model():
     global _model
     if _model is None:
+        from sentence_transformers import SentenceTransformer
+
         _model = SentenceTransformer("all-MiniLM-L6-v2")
     return _model
 
@@ -34,6 +32,8 @@ def retrieve_matching_jobs(
     Returns raw matches with metadata.
     """
     try:
+        from pinecone import Pinecone
+
         model = _get_embedding_model()
 
         # Embed resume + target role together for better matching
@@ -86,6 +86,8 @@ def score_jobs_with_claude(
     if not api_key:
         logger.warning("No ANTHROPIC_API_KEY — using Pinecone scores as fallback")
         return _fallback_scores(jobs)
+
+    from anthropic import Anthropic
 
     client = Anthropic(api_key=api_key)
     llm_model = os.getenv("LLM_MODEL", "claude-sonnet-4-20250514")

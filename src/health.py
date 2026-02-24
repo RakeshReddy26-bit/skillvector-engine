@@ -10,7 +10,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
-VERSION = "0.2.0"
+VERSION = "3.0.0"
 
 
 def check_health() -> dict:

@@ -1,6 +1,5 @@
 import logging
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
 from src.utils.errors import EmbeddingError, ValidationError
 
@@ -13,6 +12,8 @@ class EmbeddingService:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
         logger.info("Loading embedding model: %s", model_name)
         try:
+            from sentence_transformers import SentenceTransformer
+
             self.model = SentenceTransformer(model_name)
         except Exception as e:
             raise EmbeddingError(f"Failed to load embedding model '{model_name}': {e}") from e

@@ -7,7 +7,7 @@ from src.utils.errors import ValidationError, EmbeddingError
 
 
 class TestEmbeddingService:
-    @patch("src.embeddings.embedding_service.SentenceTransformer")
+    @patch("sentence_transformers.SentenceTransformer")
     def test_embed_returns_numpy_array(self, mock_st):
         mock_model = MagicMock()
         mock_model.encode.return_value = np.zeros(384)
@@ -19,7 +19,7 @@ class TestEmbeddingService:
         assert isinstance(result, np.ndarray)
         assert len(result) == 384
 
-    @patch("src.embeddings.embedding_service.SentenceTransformer")
+    @patch("sentence_transformers.SentenceTransformer")
     def test_embed_calls_model_with_normalization(self, mock_st):
         mock_model = MagicMock()
         mock_model.encode.return_value = np.zeros(384)
@@ -30,7 +30,7 @@ class TestEmbeddingService:
 
         mock_model.encode.assert_called_once_with("test text", normalize_embeddings=True)
 
-    @patch("src.embeddings.embedding_service.SentenceTransformer")
+    @patch("sentence_transformers.SentenceTransformer")
     def test_embed_empty_text_raises_validation_error(self, mock_st):
         mock_st.return_value = MagicMock()
         service = EmbeddingService()
@@ -38,7 +38,7 @@ class TestEmbeddingService:
         with pytest.raises(ValidationError, match="empty"):
             service.embed("")
 
-    @patch("src.embeddings.embedding_service.SentenceTransformer")
+    @patch("sentence_transformers.SentenceTransformer")
     def test_embed_whitespace_text_raises_validation_error(self, mock_st):
         mock_st.return_value = MagicMock()
         service = EmbeddingService()
@@ -46,7 +46,7 @@ class TestEmbeddingService:
         with pytest.raises(ValidationError, match="empty"):
             service.embed("   ")
 
-    @patch("src.embeddings.embedding_service.SentenceTransformer")
+    @patch("sentence_transformers.SentenceTransformer")
     def test_model_failure_raises_embedding_error(self, mock_st):
         mock_model = MagicMock()
         mock_model.encode.side_effect = RuntimeError("model crashed")
@@ -57,7 +57,7 @@ class TestEmbeddingService:
             service.embed("valid text")
 
     def test_init_failure_raises_embedding_error(self):
-        with patch("src.embeddings.embedding_service.SentenceTransformer",
+        with patch("sentence_transformers.SentenceTransformer",
                    side_effect=RuntimeError("cannot load model")):
             with pytest.raises(EmbeddingError):
                 EmbeddingService(model_name="nonexistent-model")
