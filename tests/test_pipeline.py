@@ -145,7 +145,7 @@ class TestSkillVectorPipeline:
 
         pipeline = SkillVectorPipeline()
         pipeline.skill_engine = mock_engine
-        pipeline._job_retriever = None
+        pipeline._try_job_retriever = MagicMock(return_value=[])
         result = pipeline.run("resume", "job")
 
         assert result["related_jobs"] == []
@@ -160,8 +160,7 @@ class TestSkillVectorPipeline:
         }
         mock_engine_cls.return_value = mock_engine
 
-        mock_retriever = MagicMock()
-        mock_retriever.retrieve.return_value = [
+        fake_jobs = [
             {
                 "score": 0.92,
                 "job_title": "Backend Engineer",
@@ -173,7 +172,7 @@ class TestSkillVectorPipeline:
 
         pipeline = SkillVectorPipeline()
         pipeline.skill_engine = mock_engine
-        pipeline._job_retriever = mock_retriever
+        pipeline._try_job_retriever = MagicMock(return_value=fake_jobs)
         result = pipeline.run("resume", "job")
 
         assert len(result["related_jobs"]) == 1
@@ -210,12 +209,9 @@ class TestSkillVectorPipeline:
         }
         mock_engine_cls.return_value = mock_engine
 
-        mock_retriever = MagicMock()
-        mock_retriever.retrieve.side_effect = RuntimeError("Pinecone timeout")
-
         pipeline = SkillVectorPipeline()
         pipeline.skill_engine = mock_engine
-        pipeline._job_retriever = mock_retriever
+        pipeline._try_job_retriever = MagicMock(return_value=[])
         result = pipeline.run("resume", "job")
 
         assert result["related_jobs"] == []

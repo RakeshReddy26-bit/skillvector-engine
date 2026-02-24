@@ -21,10 +21,10 @@ jobs:
         run: pip install ruff
 
       - name: Lint
-        run: ruff check src/ tests/ app/
+        run: ruff check src/ tests/ app/ api/
 
       - name: Format check
-        run: ruff format --check src/ tests/ app/
+        run: ruff format --check src/ tests/ app/ api/
 
   test:
     runs-on: ubuntu-latest
@@ -41,12 +41,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-mock
+          pip install pytest pytest-cov pytest-mock httpx
 
       - name: Run tests
         env:
           ANTHROPIC_API_KEY: test-key
           PINECONE_API_KEY: test-key
+          JWT_SECRET: test-secret
         run: pytest tests/ -v --tb=short --cov=src --cov-report=term-missing
 
   type-check:

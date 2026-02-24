@@ -5,11 +5,13 @@ services:
     plan: free
     region: oregon
     buildCommand: pip install -r requirements.txt
-    startCommand: python -m streamlit run app/streamlit_app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true
-    healthCheckPath: /
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      - key: RENDER
+        value: "true"
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: NEO4J_URI
@@ -28,5 +30,13 @@ services:
         value: INFO
       - key: RATE_LIMIT_PER_HOUR
         value: "10"
-      - key: ADMIN_EMAIL
+      - key: JWT_SECRET
         sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_ID
+        sync: false
+      - key: FRONTEND_URL
+        value: "https://skillvector-eta.vercel.app"

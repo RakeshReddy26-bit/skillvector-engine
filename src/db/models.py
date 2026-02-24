@@ -36,7 +36,8 @@ class UserRepository:
         conn = get_connection()
         try:
             row = conn.execute(
-                "SELECT id, email, password_hash, created_at FROM users WHERE email = ?",
+                "SELECT id, email, password_hash, plan_tier, stripe_customer_id, "
+                "stripe_subscription_id, created_at FROM users WHERE email = ?",
                 (email.lower().strip(),),
             ).fetchone()
             return dict(row) if row else None
@@ -46,6 +47,68 @@ class UserRepository:
     def user_exists(self, email: str) -> bool:
         """Check if a user email is already registered."""
         return self.get_user_by_email(email) is not None
+
+    def get_user_by_id(self, user_id: str) -> Optional[dict]:
+        """Find a user by ID."""
+        conn = get_connection()
+        try:
+            row = conn.execute(
+                "SELECT id, email, password_hash, plan_tier, stripe_customer_id, "
+                "stripe_subscription_id, created_at FROM users WHERE id = ?",
+                (user_id,),
+            ).fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    def update_plan(
+        self,
+        user_id: str,
+        plan_tier: str,
+        stripe_customer_id: str = None,
+        stripe_subscription_id: str = None,
+    ) -> None:
+        """Update user plan tier and Stripe IDs."""
+        conn = get_connection()
+        try:
+            conn.execute(
+                """UPDATE users SET plan_tier = ?,
+                   stripe_customer_id = COALESCE(?, stripe_customer_id),
+                   stripe_subscription_id = COALESCE(?, stripe_subscription_id)
+                   WHERE id = ?""",
+                (plan_tier, stripe_customer_id, stripe_subscription_id, user_id),
+            )
+            conn.commit()
+            logger.info("Updated plan for user %s to %s", user_id, plan_tier)
+        finally:
+            conn.close()
+
+    def get_user_by_stripe_customer(self, stripe_customer_id: str) -> Optional[dict]:
+        """Find a user by Stripe customer ID."""
+        conn = get_connection()
+        try:
+            row = conn.execute(
+                "SELECT id, email, password_hash, plan_tier, stripe_customer_id, "
+                "stripe_subscription_id, created_at FROM users WHERE stripe_customer_id = ?",
+                (stripe_customer_id,),
+            ).fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    def count_monthly_analyses(self, user_id: str) -> int:
+        """Count analyses this calendar month for a user."""
+        conn = get_connection()
+        try:
+            row = conn.execute(
+                """SELECT COUNT(*) as cnt FROM analyses
+                   WHERE user_id = ?
+                   AND created_at >= date('now', 'start of month')""",
+                (user_id,),
+            ).fetchone()
+            return row["cnt"] if row else 0
+        finally:
+            conn.close()
 
 
 class AnalysisRepository:

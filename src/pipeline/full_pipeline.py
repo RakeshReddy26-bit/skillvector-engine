@@ -23,7 +23,6 @@ class SkillVectorPipeline:
         self.evidence_engine = EvidenceEngine()
         self.interview_generator = InterviewGenerator()
         self.rubric_engine = RubricEngine()
-        self._job_retriever = self._try_job_retriever()
 
     @staticmethod
     def _try_neo4j_client():
@@ -39,17 +38,66 @@ class SkillVectorPipeline:
             logger.debug("Neo4j unavailable: %s", e)
         return None
 
-    @staticmethod
-    def _try_job_retriever():
-        """Return a JobRetriever if Pinecone is configured, else None."""
+    def _try_job_retriever(
+        self,
+        resume_text: str,
+        target_role: str,
+        missing_skills: list,
+    ) -> list:
+        """RAG job retrieval using Pinecone + Claude scoring.
+
+        Gracefully degrades if Pinecone is unavailable.
+        """
         try:
-            from src.rag.retrieve_jobs import JobRetriever
-            retriever = JobRetriever(top_k=5)
-            logger.info("Pinecone connected — related jobs enabled")
-            return retriever
+            from src.jobs.rag_retriever import retrieve_matching_jobs, score_jobs_with_claude
+
+            # Step 1: Get semantic matches from Pinecone
+            raw_jobs = retrieve_matching_jobs(
+                resume_text=resume_text,
+                target_role=target_role,
+                top_k=10,
+            )
+
+            if not raw_jobs:
+                logger.warning("No jobs retrieved from Pinecone")
+                return []
+
+            # Step 2: Score with Claude for accuracy
+            scored_jobs = score_jobs_with_claude(
+                resume_text=resume_text,
+                target_role=target_role,
+                jobs=raw_jobs,
+                missing_skills=missing_skills,
+            )
+
+            # Step 3: Normalize output to keep backward-compatible keys
+            result = []
+            for job in scored_jobs:
+                result.append({
+                    # Backward-compatible keys (existing frontend expects these)
+                    "score": job.get("pinecone_score", job.get("match_score", 0) / 100),
+                    "job_title": job.get("title", "Unknown"),
+                    "company": job.get("company", "Unknown"),
+                    "skills": job.get("required_skills", job.get("skills", [])),
+                    "chunk": job.get("description_preview", job.get("text", "")),
+                    # New enriched fields
+                    "location": job.get("location", ""),
+                    "salary": job.get("salary", ""),
+                    "apply_url": job.get("apply_url", ""),
+                    "posted_days_ago": job.get("posted_days_ago", 0),
+                    "match_score": job.get("match_score", 0),
+                    "match_label": job.get("match_label", ""),
+                    "why_match": job.get("why_match", ""),
+                    "why_gap": job.get("why_gap", ""),
+                    "best_skill_to_close_gap": job.get("best_skill_to_close_gap", ""),
+                })
+
+            logger.info("Job retrieval complete: %d jobs scored", len(result))
+            return result
+
         except Exception as e:
-            logger.debug("Pinecone unavailable, related jobs disabled: %s", e)
-        return None
+            logger.error("Job retrieval pipeline failed: %s", e)
+            return []
 
     def run(self, resume: str, target_job: str) -> dict:
         """Run the full analysis pipeline.
@@ -104,13 +152,8 @@ class SkillVectorPipeline:
             logger.warning("Rubric generation failed: %s", e)
             rubrics = []
 
-        # 7. Related jobs (optional — requires Pinecone)
-        related_jobs = []
-        if self._job_retriever:
-            try:
-                related_jobs = self._job_retriever.retrieve(target_job)
-            except Exception as e:
-                logger.warning("Related jobs retrieval failed: %s", e)
+        # 7. Related jobs (RAG: Pinecone retrieval + Claude scoring)
+        related_jobs = self._try_job_retriever(resume, target_job, missing_skills)
 
         result = {
             "match_score": match_score,

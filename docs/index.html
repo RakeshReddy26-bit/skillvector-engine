@@ -72,7 +72,8 @@
   }
   .nav-link:hover { color:var(--accent); }
   .nav-status { display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
-  .dot { width:6px; height:6px; background:var(--accent); border-radius:50%; animation:pulse 2s ease infinite; }
+  .dot { width:6px; height:6px; background:var(--muted); border-radius:50%; }
+  .dot.live { background:var(--accent); animation:pulse 2s ease infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
   /* HERO */
@@ -96,19 +97,26 @@
 
   @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
 
-  /* UPLOAD ZONE */
-  .upload-zone {
-    margin:40px auto 0; max-width:640px;
-    border:1px dashed rgba(0,229,160,0.25); border-radius:8px;
-    padding:48px 32px; text-align:center; cursor:pointer;
-    background:rgba(0,229,160,0.02); transition:all 0.3s;
+  /* INPUT ZONE */
+  .input-zone {
+    margin:40px auto 0; max-width:700px;
+    border:1px solid rgba(0,229,160,0.15); border-radius:10px;
+    padding:32px; text-align:left;
+    background:var(--surface); transition:all 0.3s;
     animation: fadeUp 0.6s 0.3s ease both;
   }
-  .upload-zone:hover { border-color:var(--accent); background:rgba(0,229,160,0.05); }
-  .upload-icon { font-size:36px; margin-bottom:16px; }
-  .upload-zone h3 { font-size:18px; font-weight:700; margin-bottom:8px; }
-  .upload-zone p { font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); }
-  .input-row { display:flex; gap:12px; margin-top:24px; }
+  .input-zone label {
+    display:block; font-family:'DM Mono',monospace; font-size:11px;
+    color:var(--muted); letter-spacing:1px; margin-bottom:8px;
+  }
+  .input-zone textarea {
+    width:100%; min-height:140px; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); padding:14px 16px; border-radius:6px; font-family:'DM Mono',monospace;
+    font-size:12px; line-height:1.6; outline:none; resize:vertical; transition:border 0.2s;
+  }
+  .input-zone textarea:focus { border-color:rgba(0,229,160,0.4); }
+  .input-zone textarea::placeholder { color:var(--muted); }
+  .input-row { display:flex; gap:12px; margin-top:16px; }
   .input-row input {
     flex:1; background:var(--surface2); border:1px solid var(--border);
     color:var(--text); padding:12px 16px; border-radius:6px; font-family:'Syne',sans-serif;
@@ -122,12 +130,34 @@
     letter-spacing:0.5px; transition:all 0.2s; text-decoration:none; display:inline-block;
   }
   .btn:hover { background:#00ffb3; transform:translateY(-1px); }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
   .btn-outline {
     padding:12px 28px; background:transparent; color:var(--accent); font-family:'Syne',sans-serif;
     font-weight:700; font-size:13px; border:1px solid rgba(0,229,160,0.3); border-radius:6px;
     cursor:pointer; letter-spacing:0.5px; transition:all 0.2s; text-decoration:none;
   }
   .btn-outline:hover { border-color:var(--accent); background:rgba(0,229,160,0.05); }
+
+  /* STATUS MESSAGES */
+  .status-msg {
+    margin-top:16px; padding:12px 16px; border-radius:6px;
+    font-family:'DM Mono',monospace; font-size:12px; line-height:1.6;
+    display:none;
+  }
+  .status-msg.loading {
+    display:block; background:rgba(0,229,160,0.06); border:1px solid rgba(0,229,160,0.15);
+    color:var(--accent);
+  }
+  .status-msg.error {
+    display:block; background:rgba(255,107,107,0.06); border:1px solid rgba(255,107,107,0.15);
+    color:var(--warn);
+  }
+  .spinner {
+    display:inline-block; width:14px; height:14px; border:2px solid rgba(0,229,160,0.3);
+    border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite;
+    vertical-align:middle; margin-right:8px;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
 
   /* SECTION */
   .section { padding:60px 0; }
@@ -153,11 +183,10 @@
   .score-ring .track { fill:none; stroke:rgba(255,255,255,0.05); stroke-width:8; }
   .score-ring .fill {
     fill:none; stroke:var(--accent); stroke-width:8;
-    stroke-linecap:round; stroke-dasharray:440; stroke-dashoffset:110;
+    stroke-linecap:round; stroke-dasharray:440;
     filter:drop-shadow(0 0 6px rgba(0,229,160,0.5));
-    animation: fillRing 1.5s ease both 0.5s;
+    transition: stroke-dashoffset 1.5s ease;
   }
-  @keyframes fillRing { from{stroke-dashoffset:440} to{stroke-dashoffset:110} }
   .score-center {
     position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:center;
@@ -230,18 +259,9 @@
   .ev-title { font-size:14px; font-weight:700; }
   .ev-skill { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent2); background:rgba(124,111,255,0.08); border:1px solid rgba(124,111,255,0.15); padding:2px 8px; border-radius:2px; }
   .ev-desc { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); line-height:1.6; margin-bottom:16px; }
-  .deliverables { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+  .deliverables { display:flex; flex-direction:column; gap:6px; }
   .deliverable { display:flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
   .deliverable::before { content:'\2192'; color:var(--accent); font-size:10px; }
-  .ev-actions { display:flex; gap:8px; }
-  .ev-btn {
-    flex:1; padding:8px 12px; text-align:center; font-family:'DM Mono',monospace; font-size:10px;
-    letter-spacing:0.5px; border-radius:4px; cursor:pointer; transition:all 0.2s;
-  }
-  .ev-btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
-  .ev-btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-  .ev-btn-fill { background:rgba(124,111,255,0.1); border:1px solid rgba(124,111,255,0.2); color:var(--accent2); }
-  .ev-btn-fill:hover { background:rgba(124,111,255,0.2); }
 
   /* JOB CARD */
   .job-card {
@@ -308,6 +328,31 @@
   .footer-links { display:flex; gap:24px; justify-content:center; margin-top:12px; }
   .footer-links a { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); text-decoration:none; transition:color 0.2s; }
   .footer-links a:hover { color:var(--accent); }
+
+  /* INTERVIEW PREP */
+  .interview-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:24px; transition:all 0.3s;
+  }
+  .interview-card:hover { border-color:rgba(0,229,160,0.2); }
+  .interview-skill { font-size:15px; font-weight:700; margin-bottom:4px; }
+  .interview-difficulty {
+    font-family:'DM Mono',monospace; font-size:10px; color:var(--accent);
+    background:rgba(0,229,160,0.08); border:1px solid rgba(0,229,160,0.15);
+    padding:2px 8px; border-radius:2px; display:inline-block; margin-bottom:12px;
+  }
+  .interview-q {
+    font-family:'DM Mono',monospace; font-size:11px; color:var(--muted);
+    line-height:1.6; padding:6px 0; border-bottom:1px solid var(--border);
+  }
+  .interview-q:last-child { border-bottom:none; }
+
+  /* LATENCY BAR */
+  .latency-bar {
+    margin-top:12px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted);
+    text-align:center;
+  }
+  .latency-bar span { color:var(--accent); }
 </style>
 </head>
 <body>
@@ -320,7 +365,7 @@
       <div class="nav-tag">V2.0 PRODUCTION</div>
       <div class="nav-links">
         <a href="https://github.com/RakeshReddy26-bit/skillvector-engine" class="nav-link" target="_blank">GITHUB</a>
-        <div class="nav-status"><div class="dot"></div>CLAUDE SONNET CONNECTED</div>
+        <div class="nav-status"><div class="dot" id="statusDot"></div><span id="statusText">CHECKING API...</span></div>
       </div>
     </div>
   </div>
@@ -332,14 +377,17 @@
     <div class="hero-label">AI CAREER INTELLIGENCE PLATFORM</div>
     <h1>Your Career,<br/><em>Signal-First.</em></h1>
     <p>Deterministic skill gap analysis. Real evidence projects. Prerequisite-ordered learning paths. Built on Claude Sonnet. 115 tests. Open source.</p>
-    <div class="upload-zone" id="uploadZone">
-      <div class="upload-icon">&#11014;</div>
-      <h3>Drop your resume here</h3>
-      <p>PDF, DOCX, or TXT — or paste directly in the app</p>
-      <div class="input-row">
-        <input type="text" placeholder="Target Role — e.g. Senior ML Engineer" id="roleInput"/>
-        <a href="https://skillvector-engine.streamlit.app" class="btn" target="_blank">LAUNCH APP &rarr;</a>
+
+    <!-- INPUT ZONE -->
+    <div class="input-zone" id="inputZone">
+      <label>PASTE YOUR RESUME</label>
+      <textarea id="resumeInput" placeholder="Paste your full resume text here... (minimum 50 characters)"></textarea>
+      <label style="margin-top:16px;">TARGET JOB DESCRIPTION</label>
+      <textarea id="jobInput" style="min-height:100px;" placeholder="Paste the target job description here... (minimum 50 characters)"></textarea>
+      <div class="input-row" style="margin-top:20px; justify-content:center;">
+        <button class="btn" id="analyzeBtn" onclick="analyzeResume()">ANALYZE MY SKILLS &rarr;</button>
       </div>
+      <div class="status-msg" id="statusMsg"></div>
     </div>
   </div>
 
@@ -363,212 +411,80 @@
     </div>
   </div>
 
-  <!-- MATCH SCORE -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-num">01</span>
-      <span class="section-title">Intelligence Score</span>
-    </div>
-    <div class="score-panel">
-      <div class="score-ring">
-        <svg width="160" height="160" viewBox="0 0 160 160">
-          <circle class="track" cx="80" cy="80" r="70"/>
-          <circle class="fill" cx="80" cy="80" r="70"/>
-        </svg>
-        <div class="score-center">
-          <div class="score-num">75</div>
-          <div class="score-label">MATCH %</div>
-        </div>
-      </div>
-      <div class="score-info">
-        <h2>Strong Candidate Signal</h2>
-        <p>Claude analyzed your resume against Senior ML Engineer at Stripe. You have strong foundations — 3 critical skill gaps identified with clear evidence paths.</p>
-        <div class="badges">
-          <span class="badge badge-green">&#10003; PYTHON EXPERT</span>
-          <span class="badge badge-green">&#10003; ML PIPELINES</span>
-          <span class="badge badge-red">&#10007; MISSING: MLOps</span>
-          <span class="badge badge-red">&#10007; MISSING: LLMOps</span>
-          <span class="badge badge-purple">~ PARTIAL: System Design</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- RESULTS (hidden until analysis completes) -->
+  <div id="results" style="display:none;">
 
-  <!-- SKILL GAPS -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-num">02</span>
-      <span class="section-title">Missing Skills — Critical Gaps</span>
-    </div>
-    <div class="grid3">
-      <div class="skill-card high">
-        <div class="skill-name">MLOps / Kubeflow</div>
-        <div class="skill-why">Required for deploying and monitoring models at scale. Appears in 87% of senior ML roles. Stripe specifically uses KFP in prod.</div>
-        <div class="priority high-color"><span class="priority-dot high-dot"></span>CRITICAL PRIORITY</div>
+    <!-- 01 MATCH SCORE -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-title">Intelligence Score</span>
       </div>
-      <div class="skill-card high">
-        <div class="skill-name">LLMOps &amp; Evals</div>
-        <div class="skill-why">With LLM products proliferating, eval frameworks (deepeval, RAGAS) are now table-stakes for senior engineers. Not in your CV at all.</div>
-        <div class="priority high-color"><span class="priority-dot high-dot"></span>CRITICAL PRIORITY</div>
-      </div>
-      <div class="skill-card med">
-        <div class="skill-name">Distributed Systems</div>
-        <div class="skill-why">You have Spark basics. Stripe needs deep knowledge of fault tolerance, CAP theorem, and distributed training coordination.</div>
-        <div class="priority med-color"><span class="priority-dot med-dot"></span>MEDIUM PRIORITY</div>
-      </div>
-      <div class="skill-card low">
-        <div class="skill-name">Feature Stores</div>
-        <div class="skill-why">Feast or Tecton experience validates production ML mindset. Increasingly standard at companies with &gt;10 models in production.</div>
-        <div class="priority low-color"><span class="priority-dot low-dot"></span>GROWTH SIGNAL</div>
-      </div>
-      <div class="skill-card low">
-        <div class="skill-name">RL From Human Feedback</div>
-        <div class="skill-why">RLHF is now a differentiator at AI-first companies. Even surface-level understanding signals strong alignment with modern ML direction.</div>
-        <div class="priority low-color"><span class="priority-dot low-dot"></span>GROWTH SIGNAL</div>
-      </div>
-      <div class="skill-card med">
-        <div class="skill-name">System Design (ML-scale)</div>
-        <div class="skill-why">Can design a recommendation system end-to-end? Inference latency tradeoffs? This is what the technical loop at Stripe will test on.</div>
-        <div class="priority med-color"><span class="priority-dot med-dot"></span>MEDIUM PRIORITY</div>
+      <div class="score-panel">
+        <div class="score-ring">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle class="track" cx="80" cy="80" r="70"/>
+            <circle class="fill" id="scoreRingFill" cx="80" cy="80" r="70" stroke-dashoffset="440"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-num" id="scoreNum">0</div>
+            <div class="score-label">MATCH %</div>
+          </div>
+        </div>
+        <div class="score-info">
+          <h2 id="scoreTitle">Analyzing...</h2>
+          <p id="scoreDesc"></p>
+          <div class="badges" id="scoreBadges"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- LEARNING PATH -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-num">03</span>
-      <span class="section-title">Learning Path — Prerequisite Ordered</span>
+    <!-- 02 SKILL GAPS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-title">Missing Skills — Critical Gaps</span>
+      </div>
+      <div class="grid3" id="skillsGrid"></div>
     </div>
-    <div class="timeline">
-      <div class="t-item">
-        <div class="t-dot"></div>
-        <div class="t-card">
-          <div class="t-header">
-            <div class="t-title">Week 1-2 &middot; MLOps Foundations</div>
-            <div class="t-dur">2 WEEKS</div>
-          </div>
-          <div class="t-desc">Complete "MLOps Zoomcamp" free course. Build a Kubeflow pipeline locally. Deploy a model with FastAPI + Docker. Document and push to GitHub.</div>
-        </div>
-      </div>
-      <div class="t-item">
-        <div class="t-dot"></div>
-        <div class="t-card">
-          <div class="t-header">
-            <div class="t-title">Week 3-4 &middot; LLMOps &amp; Evals</div>
-            <div class="t-dur">2 WEEKS</div>
-          </div>
-          <div class="t-desc">Implement a RAG pipeline. Add deepeval evaluation suite. Score outputs using RAGAS. Build a LangSmith dashboard. All code open on GitHub.</div>
-        </div>
-      </div>
-      <div class="t-item">
-        <div class="t-dot"></div>
-        <div class="t-card">
-          <div class="t-header">
-            <div class="t-title">Week 5-6 &middot; Distributed Systems</div>
-            <div class="t-dur">2 WEEKS</div>
-          </div>
-          <div class="t-desc">Complete "Designing Data-Intensive Applications" Chapters 5-9. Build one distributed training job with Ray. Document tradeoffs in a report.</div>
-        </div>
-      </div>
-      <div class="t-item">
-        <div class="t-dot"></div>
-        <div class="t-card">
-          <div class="t-header">
-            <div class="t-title">Week 7-8 &middot; Portfolio Polish + Apply</div>
-            <div class="t-dur">2 WEEKS</div>
-          </div>
-          <div class="t-desc">Bundle all projects as "Career Evidence Pack". Refactor README files. Update LinkedIn with project links. Begin applications with strong signal evidence.</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- EVIDENCE -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-num">04</span>
-      <span class="section-title">Evidence Builder — Portfolio Projects</span>
-    </div>
-    <div class="grid2">
-      <div class="ev-card">
-        <div class="ev-header">
-          <div class="ev-title">ML Model Deployment Pipeline</div>
-          <div class="ev-skill">MLOps</div>
-        </div>
-        <div class="ev-desc">Build a production-grade model serving system using FastAPI, Docker, and Kubeflow. Include drift monitoring, auto-retraining trigger, and Prometheus metrics.</div>
-        <div class="deliverables">
-          <div class="deliverable">GitHub repo with full CI/CD pipeline</div>
-          <div class="deliverable">Docker Compose local setup</div>
-          <div class="deliverable">Grafana monitoring dashboard</div>
-          <div class="deliverable">README with architecture diagram</div>
-        </div>
-        <div class="ev-actions">
-          <button class="ev-btn ev-btn-ghost">VIEW DETAILS</button>
-          <button class="ev-btn ev-btn-fill">START PROJECT</button>
-        </div>
+    <!-- 03 LEARNING PATH -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-title">Learning Path — Prerequisite Ordered</span>
       </div>
-      <div class="ev-card">
-        <div class="ev-header">
-          <div class="ev-title">RAG Eval Framework</div>
-          <div class="ev-skill">LLMOps</div>
-        </div>
-        <div class="ev-desc">Create a complete RAG pipeline with Claude as the LLM layer. Add structured evaluation using RAGAS and deepeval. Publish benchmark results publicly.</div>
-        <div class="deliverables">
-          <div class="deliverable">Pinecone vector store integration</div>
-          <div class="deliverable">Claude Sonnet analysis layer</div>
-          <div class="deliverable">RAGAS scorecard dashboard</div>
-          <div class="deliverable">Blog post writeup (300 words)</div>
-        </div>
-        <div class="ev-actions">
-          <button class="ev-btn ev-btn-ghost">VIEW DETAILS</button>
-          <button class="ev-btn ev-btn-fill">START PROJECT</button>
-        </div>
-      </div>
+      <div class="timeline" id="learningTimeline"></div>
     </div>
-  </div>
 
-  <!-- RELATED JOBS -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-num">05</span>
-      <span class="section-title">Related Jobs — Semantic Match via Pinecone</span>
+    <!-- 04 EVIDENCE -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="section-title">Evidence Builder — Portfolio Projects</span>
+      </div>
+      <div class="grid2" id="evidenceGrid"></div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      <div class="job-card">
-        <div class="job-match">75%<small>MATCH</small></div>
-        <div class="job-info">
-          <div class="job-title">Senior ML Engineer</div>
-          <div class="job-co">Stripe &middot; San Francisco, CA</div>
-          <div class="job-skills">
-            <span class="jskill">Python</span><span class="jskill">MLOps</span><span class="jskill">LLMOps</span><span class="jskill">Kubeflow</span><span class="jskill">Distributed Systems</span>
-          </div>
-        </div>
-        <div class="job-arrow">&rarr;</div>
+
+    <!-- 05 INTERVIEW PREP -->
+    <div class="section" id="interviewSection" style="display:none;">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <span class="section-title">Interview Prep</span>
       </div>
-      <div class="job-card">
-        <div class="job-match">68%<small>MATCH</small></div>
-        <div class="job-info">
-          <div class="job-title">ML Platform Engineer</div>
-          <div class="job-co">Anthropic &middot; San Francisco, CA</div>
-          <div class="job-skills">
-            <span class="jskill">Python</span><span class="jskill">Evals</span><span class="jskill">Ray</span><span class="jskill">Feature Stores</span>
-          </div>
-        </div>
-        <div class="job-arrow">&rarr;</div>
-      </div>
-      <div class="job-card">
-        <div class="job-match">61%<small>MATCH</small></div>
-        <div class="job-info">
-          <div class="job-title">AI/ML Engineer</div>
-          <div class="job-co">Notion &middot; Remote</div>
-          <div class="job-skills">
-            <span class="jskill">Python</span><span class="jskill">FastAPI</span><span class="jskill">LLMs</span><span class="jskill">RLHF</span>
-          </div>
-        </div>
-        <div class="job-arrow">&rarr;</div>
-      </div>
+      <div class="grid2" id="interviewGrid"></div>
     </div>
+
+    <!-- 06 RELATED JOBS -->
+    <div class="section" id="jobsSection" style="display:none;">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <span class="section-title">Related Jobs — Semantic Match via Pinecone</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;" id="jobsList"></div>
+    </div>
+
+    <div class="latency-bar" id="latencyBar"></div>
   </div>
 
   <!-- TECH STACK -->
@@ -580,7 +496,7 @@
     <div class="stack-grid">
       <div class="stack-chip">Python 3.11</div>
       <div class="stack-chip">Claude Sonnet (Anthropic)</div>
-      <div class="stack-chip">Streamlit</div>
+      <div class="stack-chip">FastAPI</div>
       <div class="stack-chip">Pinecone</div>
       <div class="stack-chip">Neo4j</div>
       <div class="stack-chip">LangChain</div>
@@ -593,9 +509,9 @@
   <!-- CTA -->
   <div class="cta-section">
     <h2>Try It Free. <em style="color:var(--accent); font-style:normal;">Right Now.</em></h2>
-    <p>Paste any resume. Pick any target role. Get your skill gap analysis in under 30 seconds. No signup required — hit "Try Demo" for a one-click preview.</p>
+    <p>Paste any resume. Paste any job description. Get your skill gap analysis in under 30 seconds. No signup required.</p>
     <div class="cta-buttons">
-      <a href="https://skillvector-engine.streamlit.app" class="btn" target="_blank">LAUNCH SKILLVECTOR &rarr;</a>
+      <button class="btn" onclick="document.getElementById('resumeInput').focus(); window.scrollTo({top:0,behavior:'smooth'});">START ANALYSIS &rarr;</button>
       <a href="https://github.com/RakeshReddy26-bit/skillvector-engine" class="btn-outline" target="_blank">VIEW SOURCE CODE</a>
     </div>
   </div>
@@ -606,27 +522,264 @@
     <p>SkillVector v2.0 &middot; Powered by <span>Claude Sonnet</span> &middot; Open source &middot; Built by Rakesh Reddy</p>
     <div class="footer-links">
       <a href="https://github.com/RakeshReddy26-bit/skillvector-engine" target="_blank">GitHub</a>
-      <a href="https://skillvector-engine.streamlit.app" target="_blank">Live App</a>
     </div>
   </div>
 </footer>
 
 <script>
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? window.location.origin
+  : 'https://skillvector-engine.onrender.com';
+
+// ── Pre-warm backend on page load ─────────────────────────────────────────
+(async function warmUp() {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  try {
+    const start = Date.now();
+    txt.textContent = 'WAKING SERVER...';
+    const res = await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(15000) });
+    const elapsed = Date.now() - start;
+    if (res.ok) {
+      dot.classList.add('live');
+      txt.textContent = 'API CONNECTED (' + elapsed + 'ms)';
+    } else {
+      txt.textContent = 'API ERROR';
+    }
+  } catch (_) {
+    txt.textContent = 'API OFFLINE';
+  }
+})();
+
+// ── Analyze Resume ────────────────────────────────────────────────────────
+async function analyzeResume() {
+  const resume = document.getElementById('resumeInput').value.trim();
+  const job = document.getElementById('jobInput').value.trim();
+  const btn = document.getElementById('analyzeBtn');
+  const msg = document.getElementById('statusMsg');
+
+  // Validate
+  if (resume.length < 50) {
+    showError(msg, 'Resume must be at least 50 characters.');
+    return;
+  }
+  if (job.length < 50) {
+    showError(msg, 'Job description must be at least 50 characters.');
+    return;
+  }
+
+  // Loading state
+  btn.disabled = true;
+  btn.textContent = 'ANALYZING...';
+  msg.className = 'status-msg loading';
+  msg.innerHTML = '<span class="spinner"></span>Running 7-step pipeline with Claude Sonnet... This typically takes 15-30 seconds.';
+  msg.style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
+
+    const res = await fetch(API_BASE + '/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resume: resume, target_job: job }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Request failed with status ' + res.status }));
+      throw new Error(err.error || 'Analysis failed');
+    }
+
+    const data = await res.json();
+    msg.style.display = 'none';
+    renderResults(data);
+
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      showError(msg, 'Request timed out after 2 minutes. The server may be cold-starting — please try again.');
+    } else {
+      showError(msg, e.message || 'Something went wrong. Please try again.');
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ANALYZE MY SKILLS \u2192';
+  }
+}
+
+function showError(el, text) {
+  el.className = 'status-msg error';
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+// ── Render Results ────────────────────────────────────────────────────────
+function renderResults(data) {
+  const results = document.getElementById('results');
+  results.style.display = 'block';
+
+  // 01 — Score ring
+  const score = Math.round(data.match_score);
+  const offset = 440 - (440 * score / 100);
+  document.getElementById('scoreRingFill').setAttribute('stroke-dashoffset', '440');
+  requestAnimationFrame(() => {
+    document.getElementById('scoreRingFill').setAttribute('stroke-dashoffset', String(offset));
+  });
+  document.getElementById('scoreNum').textContent = score;
+
+  // Score title
+  let title = 'Analysis Complete';
+  if (score >= 80) title = 'Excellent Match';
+  else if (score >= 60) title = 'Strong Candidate Signal';
+  else if (score >= 40) title = 'Moderate Match — Growth Needed';
+  else title = 'Significant Gaps Detected';
+  document.getElementById('scoreTitle').textContent = title;
+
+  // Score description
+  document.getElementById('scoreDesc').textContent =
+    'Match score: ' + score + '%. Learning priority: ' + data.learning_priority +
+    '. ' + data.missing_skills.length + ' skill gap(s) identified.';
+
+  // Badges — missing skills
+  const badgesEl = document.getElementById('scoreBadges');
+  badgesEl.innerHTML = '';
+  data.missing_skills.forEach(function(s) {
+    const span = document.createElement('span');
+    span.className = 'badge badge-red';
+    span.textContent = '\u2717 MISSING: ' + s;
+    badgesEl.appendChild(span);
+  });
+
+  // 02 — Skill cards
+  const grid = document.getElementById('skillsGrid');
+  grid.innerHTML = '';
+  data.missing_skills.forEach(function(skill, i) {
+    const prio = i < 2 ? 'high' : (i < 4 ? 'med' : 'low');
+    const prioLabel = prio === 'high' ? 'CRITICAL PRIORITY' : (prio === 'med' ? 'MEDIUM PRIORITY' : 'GROWTH SIGNAL');
+    const card = document.createElement('div');
+    card.className = 'skill-card ' + prio;
+    card.innerHTML =
+      '<div class="skill-name">' + esc(skill) + '</div>' +
+      '<div class="skill-why">Identified as a gap between your resume and the target role.</div>' +
+      '<div class="priority ' + prio + '-color"><span class="priority-dot ' + prio + '-dot"></span>' + prioLabel + '</div>';
+    grid.appendChild(card);
+  });
+
+  // 03 — Learning path
+  const timeline = document.getElementById('learningTimeline');
+  timeline.innerHTML = '';
+  data.learning_path.forEach(function(step, i) {
+    const item = document.createElement('div');
+    item.className = 't-item';
+    item.innerHTML =
+      '<div class="t-dot"></div>' +
+      '<div class="t-card">' +
+        '<div class="t-header">' +
+          '<div class="t-title">Step ' + (i + 1) + ' \u00B7 ' + esc(step.skill) + '</div>' +
+          '<div class="t-dur">' + (step.estimated_weeks || 2) + ' WEEKS</div>' +
+        '</div>' +
+        '<div class="t-desc">Estimated ' + (step.estimated_days || 14) + ' days of focused study.</div>' +
+      '</div>';
+    timeline.appendChild(item);
+  });
+
+  // 04 — Evidence projects
+  const evGrid = document.getElementById('evidenceGrid');
+  evGrid.innerHTML = '';
+  data.evidence.forEach(function(ev) {
+    const card = document.createElement('div');
+    card.className = 'ev-card';
+    let delivHtml = '';
+    if (ev.deliverables && ev.deliverables.length) {
+      delivHtml = '<div class="deliverables">' +
+        ev.deliverables.map(function(d) { return '<div class="deliverable">' + esc(d) + '</div>'; }).join('') +
+        '</div>';
+    }
+    card.innerHTML =
+      '<div class="ev-header">' +
+        '<div class="ev-title">' + esc(ev.project || ev.skill) + '</div>' +
+        '<div class="ev-skill">' + esc(ev.skill) + '</div>' +
+      '</div>' +
+      '<div class="ev-desc">' + esc(ev.description || '') + '</div>' +
+      delivHtml;
+    evGrid.appendChild(card);
+  });
+
+  // 05 — Interview prep
+  const intGrid = document.getElementById('interviewGrid');
+  const intSection = document.getElementById('interviewSection');
+  intGrid.innerHTML = '';
+  if (data.interview_prep && data.interview_prep.length) {
+    intSection.style.display = 'block';
+    data.interview_prep.forEach(function(ip) {
+      const card = document.createElement('div');
+      card.className = 'interview-card';
+      let qHtml = '';
+      if (ip.questions && ip.questions.length) {
+        qHtml = ip.questions.map(function(q) { return '<div class="interview-q">' + esc(q) + '</div>'; }).join('');
+      }
+      card.innerHTML =
+        '<div class="interview-skill">' + esc(ip.skill) + '</div>' +
+        '<div class="interview-difficulty">' + esc(ip.difficulty || 'Intermediate') + '</div>' +
+        qHtml;
+      intGrid.appendChild(card);
+    });
+  }
+
+  // 06 — Related jobs
+  const jobsList = document.getElementById('jobsList');
+  const jobsSection = document.getElementById('jobsSection');
+  jobsList.innerHTML = '';
+  if (data.related_jobs && data.related_jobs.length) {
+    jobsSection.style.display = 'block';
+    data.related_jobs.forEach(function(job) {
+      const pct = Math.round((job.score || 0) * 100);
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      let skillsHtml = '';
+      if (job.skills && job.skills.length) {
+        skillsHtml = job.skills.map(function(s) { return '<span class="jskill">' + esc(s) + '</span>'; }).join('');
+      }
+      card.innerHTML =
+        '<div class="job-match">' + pct + '%<small>MATCH</small></div>' +
+        '<div class="job-info">' +
+          '<div class="job-title">' + esc(job.job_title || 'Unknown') + '</div>' +
+          '<div class="job-co">' + esc(job.company || '') + '</div>' +
+          '<div class="job-skills">' + skillsHtml + '</div>' +
+        '</div>' +
+        '<div class="job-arrow">&rarr;</div>';
+      jobsList.appendChild(card);
+    });
+  }
+
+  // Latency
+  document.getElementById('latencyBar').innerHTML =
+    'Analysis completed in <span>' + data.latency_ms + 'ms</span> &middot; Request ID: ' + data.request_id;
+
+  // Scroll to results
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// HTML escape helper
+function esc(s) {
+  if (!s) return '';
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
 // Fade in sections on scroll
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if(e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='none'; }
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'none'; }
   });
 }, { threshold: 0.1 });
-document.querySelectorAll('.section, .cta-section, .stack-section, .stats-bar').forEach(el => {
-  el.style.opacity='0'; el.style.transform='translateY(30px)';
-  el.style.transition='opacity 0.6s ease, transform 0.6s ease';
+document.querySelectorAll('.section, .cta-section, .stack-section, .stats-bar').forEach(function(el) {
+  el.style.opacity = '0'; el.style.transform = 'translateY(30px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
   observer.observe(el);
-});
-
-// Upload zone interaction
-document.getElementById('uploadZone').addEventListener('click', function() {
-  window.open('https://skillvector-engine.streamlit.app', '_blank');
 });
 </script>
 </body>

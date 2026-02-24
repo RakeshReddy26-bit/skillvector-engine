@@ -69,6 +69,17 @@ def init_db() -> None:
             );
         """)
         conn.commit()
+        # v3 schema migration: add plan/stripe columns (idempotent)
+        for alter_sql in [
+            "ALTER TABLE users ADD COLUMN plan_tier TEXT NOT NULL DEFAULT 'free'",
+            "ALTER TABLE users ADD COLUMN stripe_customer_id TEXT",
+            "ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT",
+        ]:
+            try:
+                conn.execute(alter_sql)
+            except sqlite3.OperationalError:
+                pass  # Column already exists
+        conn.commit()
         logger.info("Database initialized at %s", DB_PATH)
     finally:
         conn.close()
