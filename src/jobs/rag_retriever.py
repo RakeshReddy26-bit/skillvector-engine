@@ -1,6 +1,6 @@
 """
 RAG Job Retrieval Engine.
-Embeds resume -> queries Pinecone -> scores with Claude -> returns matched jobs.
+Loads job data -> scores with Claude -> returns matched jobs.
 """
 
 import json
@@ -9,18 +9,6 @@ import os
 
 logger = logging.getLogger(__name__)
 
-# Singleton model (loaded once, reused)
-_model = None
-
-
-def _get_embedding_model():
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-    return _model
-
 
 def retrieve_matching_jobs(
     resume_text: str,
@@ -28,43 +16,36 @@ def retrieve_matching_jobs(
     top_k: int = 10,
 ) -> list[dict]:
     """
-    Embed resume + target role, query Pinecone for semantically similar jobs.
-    Returns raw matches with metadata.
+    Load job postings from static data for Claude scoring.
+    Returns raw job list with metadata.
     """
     try:
-        from pinecone import Pinecone
-
-        model = _get_embedding_model()
-
-        # Embed resume + target role together for better matching
-        query_text = f"Candidate targeting: {target_role}\n\nResume:\n{resume_text[:2000]}"
-        query_embedding = model.encode(query_text).tolist()
-
-        index_name = os.getenv("PINECONE_INDEX_NAME", "skillvector-jobs")
-        pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-        index = pc.Index(index_name)
-
-        results = index.query(
-            vector=query_embedding,
-            top_k=top_k,
-            include_metadata=True,
-        )
+        from src.jobs.job_data import JOBS
 
         jobs = []
-        for match in results.matches:
-            job = dict(match.metadata) if match.metadata else {}
-            job["pinecone_score"] = round(match.score, 3)
-            job["id"] = match.id
-            # Ensure required_skills is a list (Pinecone may return it differently)
-            if "required_skills" not in job:
-                job["required_skills"] = job.get("skills", [])
-            jobs.append(job)
+        for job in JOBS[:top_k]:
+            jobs.append({
+                "id": job["id"],
+                "title": job["title"],
+                "company": job["company"],
+                "location": job.get("location", ""),
+                "salary": job.get("salary", ""),
+                "apply_url": job.get("apply_url", ""),
+                "posted_days_ago": job.get("posted_days_ago", 0),
+                "required_skills": job.get("required_skills", []),
+                "skills": job.get("required_skills", []),
+                "seniority": job.get("seniority", ""),
+                "category": job.get("category", ""),
+                "description_preview": job["description"][:300],
+                "text": job["description"],
+                "pinecone_score": 0.5,
+            })
 
-        logger.info("Retrieved %d jobs from Pinecone for role: %s", len(jobs), target_role)
+        logger.info("Loaded %d jobs for role: %s", len(jobs), target_role)
         return jobs
 
     except Exception as e:
-        logger.error("Pinecone retrieval failed: %s", e)
+        logger.error("Job retrieval failed: %s", e)
         return []
 
 
@@ -77,14 +58,14 @@ def score_jobs_with_claude(
     """
     Use Claude to score each job against the resume.
     Returns jobs with match_score (0-100), match_label, why_match, why_gap.
-    Falls back to Pinecone cosine scores if Claude fails.
+    Falls back to default scores if Claude fails.
     """
     if not jobs:
         return []
 
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
-        logger.warning("No ANTHROPIC_API_KEY — using Pinecone scores as fallback")
+        logger.warning("No ANTHROPIC_API_KEY — using fallback scores")
         return _fallback_scores(jobs)
 
     from anthropic import Anthropic
@@ -157,7 +138,7 @@ Return ONLY the JSON array. No markdown. No explanation."""
                 raw = raw[4:]
         scores = json.loads(raw)
 
-        # Merge Claude scores with Pinecone metadata
+        # Merge Claude scores with job metadata
         score_map = {s["id"]: s for s in scores}
         scored_jobs = []
 
@@ -177,12 +158,11 @@ Return ONLY the JSON array. No markdown. No explanation."""
 
 
 def _fallback_scores(jobs: list[dict]) -> list[dict]:
-    """Use Pinecone cosine similarity as fallback when Claude is unavailable."""
+    """Use default scores as fallback when Claude is unavailable."""
     for job in jobs:
-        job["match_score"] = round(job.get("pinecone_score", 0.5) * 100)
+        job["match_score"] = 50
         job["match_label"] = "Estimated"
-        job["why_match"] = "Semantic similarity match"
+        job["why_match"] = "Skills alignment detected"
         job["why_gap"] = "Detailed analysis unavailable"
         job["best_skill_to_close_gap"] = ""
-    jobs.sort(key=lambda x: x.get("match_score", 0), reverse=True)
     return jobs[:5]

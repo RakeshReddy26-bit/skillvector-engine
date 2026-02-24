@@ -39,9 +39,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-mock httpx
+        run: pip install -r requirements-dev.txt
 
       - name: Run tests
         env:
@@ -63,9 +61,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install mypy
+        run: pip install -r requirements-dev.txt
 
       - name: Type check
         run: mypy src/ --ignore-missing-imports --no-error-summary || true
