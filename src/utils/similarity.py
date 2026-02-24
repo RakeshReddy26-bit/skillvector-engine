@@ -1,10 +1,9 @@
 import logging
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
 
-def cosine_similarity_score(vector_a: np.ndarray, vector_b: np.ndarray) -> float:
+def cosine_similarity_score(vector_a, vector_b) -> float:
     """Compute cosine similarity between two vectors, returning a 0-100 score."""
     from sklearn.metrics.pairwise import cosine_similarity
 

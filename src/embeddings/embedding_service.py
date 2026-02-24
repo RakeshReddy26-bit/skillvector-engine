@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 
 from src.utils.errors import EmbeddingError, ValidationError
 
@@ -18,7 +17,7 @@ class EmbeddingService:
         except Exception as e:
             raise EmbeddingError(f"Failed to load embedding model '{model_name}': {e}") from e
 
-    def embed(self, text: str) -> np.ndarray:
+    def embed(self, text: str):
         """Convert text to a normalized embedding vector."""
         if not text or not text.strip():
             raise ValidationError("Text for embedding cannot be empty.")
