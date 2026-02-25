@@ -13,7 +13,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from api.auth import router as auth_router
 from api.middleware import check_usage_limit, get_optional_user
@@ -288,13 +288,9 @@ async def upload_resume(
         )
 
 
-# ── Serve frontend (docs/index.html) at root ─────────────────────────────
-_FRONTEND = Path(__file__).resolve().parent.parent / "docs" / "index.html"
-
+# ── Redirect root to Vercel frontend ─────────────────────────────────────
 
 @app.get("/", include_in_schema=False)
 def frontend():
-    """Serve the SkillVector frontend."""
-    if _FRONTEND.exists():
-        return FileResponse(_FRONTEND, media_type="text/html")
-    return JSONResponse(status_code=404, content={"error": "Frontend not found"})
+    """Redirect to the Vercel frontend."""
+    return RedirectResponse(url="https://skillvector-eta.vercel.app")
