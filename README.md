@@ -4,8 +4,8 @@ AI-powered career skill gap analysis platform. Upload a resume (PDF, DOCX, TXT, 
 
 Built with **Python 3.11**, **Claude Sonnet (Anthropic)**, **FastAPI**, **Next.js 14**, **Pinecone**, **Neo4j**, **LangChain**, and **Sentence Transformers**.
 
-**Live App:** [skillvector-eta.vercel.app](https://skillvector-eta.vercel.app)
-**API Backend:** [skillvector-engine.onrender.com](https://skillvector-engine.onrender.com)
+**Live App:** [skill-vector.com](https://skill-vector.com)
+**API Backend:** [api.skill-vector.com](https://api.skill-vector.com)
 **GitHub:** [github.com/RakeshReddy26-bit/skillvector-engine](https://github.com/RakeshReddy26-bit/skillvector-engine)
 
 ---
@@ -384,13 +384,13 @@ npx vercel --prod --yes
 
 # Set environment variable
 npx vercel env add NEXT_PUBLIC_API_URL production
-# Enter: https://skillvector-engine.onrender.com
+# Enter: https://api.skill-vector.com
 ```
 
 Or connect the repo on [vercel.com](https://vercel.com) and set:
 - **Root directory:** `frontend`
 - **Framework:** Next.js
-- **Environment variable:** `NEXT_PUBLIC_API_URL` = `https://skillvector-engine.onrender.com`
+- **Environment variable:** `NEXT_PUBLIC_API_URL` = `https://api.skill-vector.com`
 
 ### CI/CD (GitHub Actions)
 

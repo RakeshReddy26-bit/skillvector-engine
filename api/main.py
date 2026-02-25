@@ -58,7 +58,7 @@ app = FastAPI(
 # CORS — production + local dev
 ALLOWED_ORIGINS = [
     "https://rakeshreddy26-bit.github.io",
-    "https://skillvector-eta.vercel.app",
+    "https://skill-vector.com",
     "http://localhost:8000",
     "http://localhost:3000",
     "http://127.0.0.1:8000",
@@ -293,4 +293,4 @@ async def upload_resume(
 @app.get("/", include_in_schema=False)
 def frontend():
     """Redirect to the Vercel frontend."""
-    return RedirectResponse(url="https://skillvector-eta.vercel.app")
+    return RedirectResponse(url="https://skill-vector.com")

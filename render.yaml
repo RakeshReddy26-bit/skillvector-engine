@@ -39,4 +39,4 @@ services:
       - key: STRIPE_PRICE_ID
         sync: false
       - key: FRONTEND_URL
-        value: "https://skillvector-eta.vercel.app"
+        value: "https://skill-vector.com"

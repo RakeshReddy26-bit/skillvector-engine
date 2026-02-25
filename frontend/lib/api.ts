@@ -1,6 +1,6 @@
 import type { AnalyzeRequest, AnalyzeResponse, AuthResponse, DisplayResult, HealthResponse, UserInfo } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://skillvector-engine.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skill-vector.com";
 
 // ── Transform API response → Display format ──────────────────────────────
 
