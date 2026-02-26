@@ -44,9 +44,13 @@ export function useGeoPrice(): GeoPrice {
     const cached = sessionStorage.getItem("sv_geo");
     if (cached) {
       try {
-        setPrice(JSON.parse(cached));
-        return;
-      } catch { /* ignore */ }
+        const parsed = JSON.parse(cached);
+        if (parsed.yearlyPrice && parsed.yearlyLabel) {
+          setPrice(parsed);
+          return;
+        }
+        sessionStorage.removeItem("sv_geo");
+      } catch { sessionStorage.removeItem("sv_geo"); }
     }
 
     fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(5000) })
