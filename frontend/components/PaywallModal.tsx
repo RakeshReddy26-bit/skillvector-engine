@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
+import { useGeoPrice } from "@/lib/use-geo-price";
 
 interface PaywallModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ const PRO_FEATURES = [
 export default function PaywallModal({ open, onClose }: PaywallModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const geo = useGeoPrice();
 
   if (!open) return null;
 
@@ -64,8 +66,13 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
 
         {/* Price */}
         <div className="text-center mb-8">
-          <span className="text-4xl font-extrabold">$9</span>
+          <span className="text-4xl font-extrabold">{geo.label}</span>
           <span className="text-[#5a6478] font-mono text-sm">/month</span>
+          {geo.countryCode !== "XX" && (
+            <p className="mt-1 font-mono text-[10px] text-[#5a6478]">
+              Pricing for {geo.country}
+            </p>
+          )}
         </div>
 
         {/* Features */}
@@ -89,11 +96,11 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
           disabled={loading}
           className="w-full py-3 bg-[#00e5a0] text-black font-bold text-sm rounded-lg hover:bg-[#00ffb3] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "REDIRECTING TO STRIPE..." : "UPGRADE TO PRO"}
+          {loading ? "REDIRECTING..." : "UPGRADE TO PRO"}
         </button>
 
         <p className="mt-4 text-center font-mono text-[10px] text-[#5a6478]">
-          Cancel anytime. Powered by Stripe.
+          Cancel anytime. Secure payment.
         </p>
       </div>
     </div>
