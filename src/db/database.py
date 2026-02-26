@@ -27,7 +27,8 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,
                 email TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
+                password_hash TEXT,
+                auth_provider TEXT NOT NULL DEFAULT 'email',
                 created_at TEXT DEFAULT (datetime('now'))
             );
 
@@ -74,6 +75,7 @@ def init_db() -> None:
             "ALTER TABLE users ADD COLUMN plan_tier TEXT NOT NULL DEFAULT 'free'",
             "ALTER TABLE users ADD COLUMN stripe_customer_id TEXT",
             "ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT",
+            "ALTER TABLE users ADD COLUMN auth_provider TEXT NOT NULL DEFAULT 'email'",
         ]:
             try:
                 conn.execute(alter_sql)

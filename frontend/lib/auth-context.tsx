@@ -34,8 +34,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Validate stored token on mount
+  // Validate stored token on mount + handle OAuth callback
   useEffect(() => {
+    // Check for OAuth token in URL params
+    const params = new URLSearchParams(window.location.search);
+    const oauthToken = params.get("token");
+    const oauthError = params.get("error");
+
+    if (oauthError) {
+      window.history.replaceState({}, "", window.location.pathname);
+      setIsLoading(false);
+      return;
+    }
+
+    if (oauthToken) {
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+      api.setToken(oauthToken);
+      setToken(oauthToken);
+      localStorage.setItem(TOKEN_KEY, oauthToken);
+      api
+        .getMe()
+        .then((u) => setUser(u))
+        .catch(() => {
+          persistToken(null);
+        })
+        .finally(() => setIsLoading(false));
+      return;
+    }
+
     const stored = localStorage.getItem(TOKEN_KEY);
     if (!stored) {
       setIsLoading(false);

@@ -13,17 +13,17 @@ logger = logging.getLogger(__name__)
 class UserRepository:
     """Data access for user accounts."""
 
-    def create_user(self, email: str, password_hash: str) -> str:
+    def create_user(self, email: str, password_hash: str, auth_provider: str = "email") -> str:
         """Create a new user. Returns user ID."""
         user_id = str(uuid.uuid4())
         conn = get_connection()
         try:
             conn.execute(
-                "INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)",
-                (user_id, email.lower().strip(), password_hash),
+                "INSERT INTO users (id, email, password_hash, auth_provider) VALUES (?, ?, ?, ?)",
+                (user_id, email.lower().strip(), password_hash, auth_provider),
             )
             conn.commit()
-            logger.info("Created user %s", email)
+            logger.info("Created user %s via %s", email, auth_provider)
             return user_id
         except Exception as e:
             logger.error("Failed to create user %s: %s", email, e)

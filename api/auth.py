@@ -4,9 +4,10 @@ import logging
 import os
 from datetime import date, datetime, timedelta, timezone
 
+import httpx
 import jwt
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from api.models import AuthResponse, LoginRequest, RegisterRequest, UserInfo, UsageResponse
 from src.auth.auth_service import AuthService
@@ -20,6 +21,15 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 72
 
 FREE_TIER_LIMIT = 3
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://skill-vector.com")
+API_URL = os.getenv("API_URL", "https://api.skill-vector.com")
+
+# OAuth config
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
 
 
 def create_token(user_id: str, email: str) -> str:
@@ -176,3 +186,147 @@ def get_usage(request: Request):
         plan_tier=plan_tier,
         resets_on=_next_reset_date(),
     )
+
+
+# ── OAuth helpers ────────────────────────────────────────────────────────
+
+
+def _oauth_login_or_create(email: str, provider: str) -> str:
+    """Find or create a user from OAuth, return JWT token."""
+    user_repo = UserRepository()
+    user = user_repo.get_user_by_email(email)
+
+    if not user:
+        user_id = user_repo.create_user(email, password_hash="", auth_provider=provider)
+    else:
+        user_id = user["id"]
+
+    return create_token(user_id, email.lower().strip())
+
+
+def _oauth_redirect(token: str) -> RedirectResponse:
+    """Redirect to frontend with JWT token."""
+    return RedirectResponse(url=f"{FRONTEND_URL}?token={token}")
+
+
+# ── Google OAuth ─────────────────────────────────────────────────────────
+
+
+@router.get("/google")
+def google_login():
+    """Redirect user to Google OAuth consent screen."""
+    params = (
+        f"client_id={GOOGLE_CLIENT_ID}"
+        f"&redirect_uri={API_URL}/auth/callback/google"
+        f"&response_type=code"
+        f"&scope=openid%20email%20profile"
+        f"&access_type=offline"
+        f"&prompt=consent"
+    )
+    return RedirectResponse(url=f"https://accounts.google.com/o/oauth2/v2/auth?{params}")
+
+
+@router.get("/callback/google")
+async def google_callback(code: str = ""):
+    """Handle Google OAuth callback."""
+    if not code:
+        return JSONResponse(status_code=400, content={"error": "Missing authorization code."})
+
+    try:
+        async with httpx.AsyncClient() as client:
+            # Exchange code for tokens
+            token_res = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "code": code,
+                    "client_id": GOOGLE_CLIENT_ID,
+                    "client_secret": GOOGLE_CLIENT_SECRET,
+                    "redirect_uri": f"{API_URL}/auth/callback/google",
+                    "grant_type": "authorization_code",
+                },
+            )
+            tokens = token_res.json()
+
+            if "error" in tokens:
+                logger.error("Google token exchange failed: %s", tokens)
+                return RedirectResponse(url=f"{FRONTEND_URL}?error=oauth_failed")
+
+            # Fetch user info
+            user_res = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {tokens['access_token']}"},
+            )
+            user_info = user_res.json()
+
+        email = user_info.get("email")
+        if not email:
+            return RedirectResponse(url=f"{FRONTEND_URL}?error=no_email")
+
+        token = _oauth_login_or_create(email, "google")
+        return _oauth_redirect(token)
+
+    except Exception as e:
+        logger.error("Google OAuth error: %s", e)
+        return RedirectResponse(url=f"{FRONTEND_URL}?error=oauth_failed")
+
+
+# ── GitHub OAuth ─────────────────────────────────────────────────────────
+
+
+@router.get("/github")
+def github_login():
+    """Redirect user to GitHub OAuth consent screen."""
+    params = f"client_id={GITHUB_CLIENT_ID}&scope=user:email"
+    return RedirectResponse(url=f"https://github.com/login/oauth/authorize?{params}")
+
+
+@router.get("/callback/github")
+async def github_callback(code: str = ""):
+    """Handle GitHub OAuth callback."""
+    if not code:
+        return JSONResponse(status_code=400, content={"error": "Missing authorization code."})
+
+    try:
+        async with httpx.AsyncClient() as client:
+            # Exchange code for access token
+            token_res = await client.post(
+                "https://github.com/login/oauth/access_token",
+                json={
+                    "client_id": GITHUB_CLIENT_ID,
+                    "client_secret": GITHUB_CLIENT_SECRET,
+                    "code": code,
+                },
+                headers={"Accept": "application/json"},
+            )
+            tokens = token_res.json()
+
+            if "error" in tokens:
+                logger.error("GitHub token exchange failed: %s", tokens)
+                return RedirectResponse(url=f"{FRONTEND_URL}?error=oauth_failed")
+
+            # Fetch user emails
+            emails_res = await client.get(
+                "https://api.github.com/user/emails",
+                headers={
+                    "Authorization": f"Bearer {tokens['access_token']}",
+                    "Accept": "application/vnd.github+json",
+                },
+            )
+            emails = emails_res.json()
+
+        # Find primary verified email
+        email = None
+        for e in emails:
+            if e.get("primary") and e.get("verified"):
+                email = e["email"]
+                break
+
+        if not email:
+            return RedirectResponse(url=f"{FRONTEND_URL}?error=no_email")
+
+        token = _oauth_login_or_create(email, "github")
+        return _oauth_redirect(token)
+
+    except Exception as e:
+        logger.error("GitHub OAuth error: %s", e)
+        return RedirectResponse(url=f"{FRONTEND_URL}?error=oauth_failed")
