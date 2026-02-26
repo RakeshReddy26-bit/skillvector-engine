@@ -20,9 +20,13 @@ const PRO_FEATURES = [
 export default function PaywallModal({ open, onClose }: PaywallModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const geo = useGeoPrice();
 
   if (!open) return null;
+
+  const isYearly = billing === "yearly";
+  const monthlySaving = Math.round(((geo.price * 12 - geo.yearlyPrice) / (geo.price * 12)) * 100);
 
   const handleUpgrade = async () => {
     setError("");
@@ -64,10 +68,44 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
           </p>
         </div>
 
+        {/* Billing Toggle */}
+        <div className="flex items-center justify-center gap-1 mb-6 bg-[#080b10] rounded-lg p-1">
+          <button
+            onClick={() => setBilling("monthly")}
+            className={`flex-1 py-2 text-[11px] font-bold rounded-md transition-all ${
+              !isYearly
+                ? "bg-[#00e5a0]/10 text-[#00e5a0] border border-[#00e5a0]/20"
+                : "text-[#5a6478] hover:text-white border border-transparent"
+            }`}
+          >
+            MONTHLY
+          </button>
+          <button
+            onClick={() => setBilling("yearly")}
+            className={`flex-1 py-2 text-[11px] font-bold rounded-md transition-all relative ${
+              isYearly
+                ? "bg-[#00e5a0]/10 text-[#00e5a0] border border-[#00e5a0]/20"
+                : "text-[#5a6478] hover:text-white border border-transparent"
+            }`}
+          >
+            YEARLY
+            <span className="ml-1 text-[9px] text-[#f59e0b]">SAVE {monthlySaving}%</span>
+          </button>
+        </div>
+
         {/* Price */}
         <div className="text-center mb-8">
-          <span className="text-4xl font-extrabold">{geo.label}</span>
-          <span className="text-[#5a6478] font-mono text-sm">/month</span>
+          <span className="text-4xl font-extrabold">
+            {isYearly ? geo.yearlyLabel : geo.label}
+          </span>
+          <span className="text-[#5a6478] font-mono text-sm">
+            {isYearly ? "/year" : "/month"}
+          </span>
+          {isYearly && (
+            <p className="mt-1 font-mono text-[10px] text-[#00e5a0]">
+              That&apos;s just {geo.symbol}{Math.round(geo.yearlyPrice / 12)}/month
+            </p>
+          )}
           {geo.countryCode !== "XX" && (
             <p className="mt-1 font-mono text-[10px] text-[#5a6478]">
               Pricing for {geo.country}

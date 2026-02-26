@@ -112,8 +112,11 @@ export default function ProfilePanel({ open, onClose, onUpgrade }: ProfilePanelP
           {/* Pro Plan */}
           <div className={`p-4 rounded-lg border ${!isFree ? "border-[#7c6fff]/30 bg-[#7c6fff]/5" : "border-white/10 bg-[#080b10]"}`}>
             <p className="font-bold text-sm mb-1">Pro</p>
-            <p className="text-2xl font-extrabold mb-2">
+            <p className="text-2xl font-extrabold mb-0.5">
               {geo.label}<span className="text-xs font-normal text-[#5a6478]">/mo</span>
+            </p>
+            <p className="font-mono text-[9px] text-[#00e5a0] mb-2">
+              or {geo.yearlyLabel}/year
             </p>
             <ul className="space-y-1 font-mono text-[10px] text-[#5a6478]">
               <li>✓ Unlimited analyses</li>

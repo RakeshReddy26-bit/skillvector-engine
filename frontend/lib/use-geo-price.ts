@@ -9,25 +9,27 @@ export interface GeoPrice {
   symbol: string;
   price: number;
   label: string;
+  yearlyPrice: number;
+  yearlyLabel: string;
 }
 
 const REGIONAL_PRICES: Record<string, GeoPrice> = {
-  IN: { country: "India", countryCode: "IN", currency: "INR", symbol: "₹", price: 199, label: "₹199" },
-  US: { country: "United States", countryCode: "US", currency: "USD", symbol: "$", price: 9, label: "$9" },
-  GB: { country: "United Kingdom", countryCode: "GB", currency: "GBP", symbol: "£", price: 7, label: "£7" },
-  DE: { country: "Germany", countryCode: "DE", currency: "EUR", symbol: "€", price: 9, label: "€9" },
-  FR: { country: "France", countryCode: "FR", currency: "EUR", symbol: "€", price: 9, label: "€9" },
-  NL: { country: "Netherlands", countryCode: "NL", currency: "EUR", symbol: "€", price: 9, label: "€9" },
-  BR: { country: "Brazil", countryCode: "BR", currency: "USD", symbol: "$", price: 5, label: "$5" },
-  NG: { country: "Nigeria", countryCode: "NG", currency: "USD", symbol: "$", price: 3, label: "$3" },
-  PK: { country: "Pakistan", countryCode: "PK", currency: "USD", symbol: "$", price: 3, label: "$3" },
-  BD: { country: "Bangladesh", countryCode: "BD", currency: "USD", symbol: "$", price: 3, label: "$3" },
-  PH: { country: "Philippines", countryCode: "PH", currency: "USD", symbol: "$", price: 4, label: "$4" },
+  IN: { country: "India", countryCode: "IN", currency: "INR", symbol: "₹", price: 199, label: "₹199", yearlyPrice: 1499, yearlyLabel: "₹1,499" },
+  US: { country: "United States", countryCode: "US", currency: "USD", symbol: "$", price: 9, label: "$9", yearlyPrice: 79, yearlyLabel: "$79" },
+  GB: { country: "United Kingdom", countryCode: "GB", currency: "GBP", symbol: "£", price: 7, label: "£7", yearlyPrice: 59, yearlyLabel: "£59" },
+  DE: { country: "Germany", countryCode: "DE", currency: "EUR", symbol: "€", price: 9, label: "€9", yearlyPrice: 79, yearlyLabel: "€79" },
+  FR: { country: "France", countryCode: "FR", currency: "EUR", symbol: "€", price: 9, label: "€9", yearlyPrice: 79, yearlyLabel: "€79" },
+  NL: { country: "Netherlands", countryCode: "NL", currency: "EUR", symbol: "€", price: 9, label: "€9", yearlyPrice: 79, yearlyLabel: "€79" },
+  BR: { country: "Brazil", countryCode: "BR", currency: "USD", symbol: "$", price: 5, label: "$5", yearlyPrice: 39, yearlyLabel: "$39" },
+  NG: { country: "Nigeria", countryCode: "NG", currency: "USD", symbol: "$", price: 3, label: "$3", yearlyPrice: 25, yearlyLabel: "$25" },
+  PK: { country: "Pakistan", countryCode: "PK", currency: "USD", symbol: "$", price: 3, label: "$3", yearlyPrice: 25, yearlyLabel: "$25" },
+  BD: { country: "Bangladesh", countryCode: "BD", currency: "USD", symbol: "$", price: 3, label: "$3", yearlyPrice: 25, yearlyLabel: "$25" },
+  PH: { country: "Philippines", countryCode: "PH", currency: "USD", symbol: "$", price: 4, label: "$4", yearlyPrice: 35, yearlyLabel: "$35" },
 };
 
 // Default for EU countries not explicitly listed
-const EU_DEFAULT: GeoPrice = { country: "Europe", countryCode: "EU", currency: "EUR", symbol: "€", price: 9, label: "€9" };
-const GLOBAL_DEFAULT: GeoPrice = { country: "Global", countryCode: "XX", currency: "USD", symbol: "$", price: 9, label: "$9" };
+const EU_DEFAULT: GeoPrice = { country: "Europe", countryCode: "EU", currency: "EUR", symbol: "€", price: 9, label: "€9", yearlyPrice: 79, yearlyLabel: "€79" };
+const GLOBAL_DEFAULT: GeoPrice = { country: "Global", countryCode: "XX", currency: "USD", symbol: "$", price: 9, label: "$9", yearlyPrice: 79, yearlyLabel: "$79" };
 
 const EU_CODES = new Set([
   "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
