@@ -1,4 +1,4 @@
-import type { AnalyzeRequest, AnalyzeResponse, AuthResponse, DisplayResult, HealthResponse, UserInfo } from "./types";
+import type { AnalysisHistoryItem, AnalyzeRequest, AnalyzeResponse, AuthResponse, DisplayResult, HealthResponse, UserInfo } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skill-vector.com";
 
@@ -196,6 +196,16 @@ class ApiClient {
     });
     if (!res.ok) throw new Error("Portal unavailable");
     return res.json() as Promise<{ portal_url: string }>;
+  }
+
+  // ── History ─────────────────────────────────────────────────────────
+
+  async getHistory(): Promise<AnalysisHistoryItem[]> {
+    const res = await fetch(`${this.base}/auth/history`, {
+      headers: this.authHeaders(),
+    });
+    if (!res.ok) throw new Error("Failed to load history");
+    return res.json() as Promise<AnalysisHistoryItem[]>;
   }
 }
 

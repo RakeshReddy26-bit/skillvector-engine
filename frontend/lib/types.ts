@@ -128,3 +128,11 @@ export interface UserInfo {
   analyses_used: number;
   analyses_limit: number; // 3 for free, -1 for unlimited
 }
+
+export interface AnalysisHistoryItem {
+  id: string;
+  match_score: number;
+  learning_priority: string;
+  missing_skills: string[];
+  created_at: string;
+}

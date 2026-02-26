@@ -15,6 +15,7 @@ import RelatedJobs from "@/components/RelatedJobs";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
+import ProfilePanel from "@/components/ProfilePanel";
 import { ScoreRingSkeleton, GridSkeleton, SectionSkeleton } from "@/components/Skeleton";
 
 const TECH_STACK = [
@@ -37,6 +38,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [showAuth, setShowAuth] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const scrollToResults = useCallback(() => {
@@ -100,11 +102,16 @@ export default function Home() {
 
   return (
     <>
-      <HealthBanner onSignIn={() => setShowAuth(true)} />
+      <HealthBanner onSignIn={() => setShowAuth(true)} onProfile={() => setShowProfile(true)} />
 
-      {/* Auth & Paywall Modals */}
+      {/* Auth, Paywall & Profile Modals */}
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
       <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
+      <ProfilePanel
+        open={showProfile}
+        onClose={() => setShowProfile(false)}
+        onUpgrade={() => { setShowProfile(false); setShowPaywall(true); }}
+      />
 
       <main className="max-w-7xl mx-auto px-6">
         {/* Hero */}

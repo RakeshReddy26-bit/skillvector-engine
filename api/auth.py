@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 
 from api.models import AuthResponse, LoginRequest, RegisterRequest, UserInfo, UsageResponse
 from src.auth.auth_service import AuthService
-from src.db.models import UserRepository
+from src.db.models import AnalysisRepository, UserRepository
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -186,6 +186,28 @@ def get_usage(request: Request):
         plan_tier=plan_tier,
         resets_on=_next_reset_date(),
     )
+
+
+@router.get("/history")
+def get_history(request: Request):
+    """Get analysis history for the current user."""
+    user = get_current_user(request)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Not authenticated."})
+
+    analysis_repo = AnalysisRepository()
+    analyses = analysis_repo.get_user_analyses(user["id"], limit=20)
+
+    return JSONResponse(content=[
+        {
+            "id": a["id"],
+            "match_score": a["match_score"],
+            "learning_priority": a["learning_priority"],
+            "missing_skills": a["missing_skills"],
+            "created_at": a["created_at"],
+        }
+        for a in analyses
+    ])
 
 
 # ── OAuth helpers ────────────────────────────────────────────────────────

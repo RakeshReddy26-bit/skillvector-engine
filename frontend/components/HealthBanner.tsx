@@ -8,9 +8,10 @@ import type { HealthResponse } from "@/lib/types";
 
 interface HealthBannerProps {
   onSignIn?: () => void;
+  onProfile?: () => void;
 }
 
-export default function HealthBanner({ onSignIn }: HealthBannerProps) {
+export default function HealthBanner({ onSignIn, onProfile }: HealthBannerProps) {
   const { user, logout } = useAuth();
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [status, setStatus] = useState<"checking" | "ok" | "error">("checking");
@@ -75,9 +76,12 @@ export default function HealthBanner({ onSignIn }: HealthBannerProps) {
           {user ? (
             <div className="flex items-center gap-3">
               <UsageBadge />
-              <span className="hidden sm:inline font-mono text-[11px] text-muted truncate max-w-[140px]">
+              <button
+                onClick={onProfile}
+                className="hidden sm:inline font-mono text-[11px] text-muted hover:text-[#00e5a0] transition-colors truncate max-w-[140px]"
+              >
                 {user.email}
-              </span>
+              </button>
               <button
                 onClick={logout}
                 className="font-mono text-[11px] text-muted hover:text-[#fca5a5] transition-colors tracking-wider"
