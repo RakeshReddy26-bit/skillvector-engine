@@ -157,6 +157,63 @@ Return ONLY the JSON array. No markdown. No explanation."""
         return _fallback_scores(jobs)
 
 
+async def embed_and_upsert_jobs(jobs: list[dict]) -> int:
+    """
+    Embed job descriptions and upsert into Pinecone.
+    Called by /automation/ingest-jobs when Atlas sends validated jobs.
+    Returns the number of jobs successfully indexed.
+    """
+    api_key = os.getenv("PINECONE_API_KEY")
+    if not api_key:
+        logger.warning("PINECONE_API_KEY not set — storing jobs in memory only")
+        from src.jobs.job_data import JOBS
+        for job in jobs:
+            job.setdefault("id", f"atlas_{hash(job.get('title', ''))}")
+            JOBS.append(job)
+        return len(jobs)
+
+    try:
+        from pinecone import Pinecone
+        from src.embeddings.embedding_service import EmbeddingService
+
+        index_name = os.getenv("PINECONE_INDEX_NAME", "skillvector-jobs")
+        pc = Pinecone(api_key=api_key)
+        index = pc.Index(index_name)
+        embedder = EmbeddingService()
+
+        vectors = []
+        for i, job in enumerate(jobs):
+            job_id = job.get("id", f"atlas_{i}_{hash(job.get('title', ''))}")
+            desc = job.get("description", "")
+            if not desc:
+                desc = f"{job.get('title', '')} at {job.get('company', '')} — {', '.join(job.get('required_skills', []))}"
+            vector = embedder.embed(desc).tolist()
+            vectors.append({
+                "id": job_id,
+                "values": vector,
+                "metadata": {
+                    "title": job.get("title", ""),
+                    "company": job.get("company", ""),
+                    "location": job.get("location", ""),
+                    "apply_url": job.get("apply_url", ""),
+                    "required_skills": json.dumps(job.get("required_skills", [])),
+                    "text": desc[:1000],
+                },
+            })
+
+        # Upsert in batches of 100
+        for batch_start in range(0, len(vectors), 100):
+            batch = vectors[batch_start:batch_start + 100]
+            index.upsert(batch)
+
+        logger.info("Upserted %d jobs into Pinecone index '%s'", len(vectors), index_name)
+        return len(vectors)
+
+    except Exception as e:
+        logger.error("Pinecone upsert failed: %s", e)
+        raise
+
+
 def _fallback_scores(jobs: list[dict]) -> list[dict]:
     """Use default scores as fallback when Claude is unavailable."""
     for job in jobs:

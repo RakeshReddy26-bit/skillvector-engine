@@ -19,6 +19,7 @@ from api.auth import router as auth_router
 from api.middleware import check_usage_limit, get_optional_user
 from api.models import AnalyzeRequest, AnalyzeResponse, ErrorResponse, HealthResponse
 from api.stripe_routes import router as stripe_router
+from src.routes.automation import router as automation_router
 from src.db.database import init_db
 from src.health import check_health
 from src.pipeline.full_pipeline import SkillVectorPipeline
@@ -76,6 +77,7 @@ app.add_middleware(
 # Mount auth and stripe routers
 app.include_router(auth_router)
 app.include_router(stripe_router)
+app.include_router(automation_router)
 
 
 @app.get("/health", response_model=HealthResponse)
