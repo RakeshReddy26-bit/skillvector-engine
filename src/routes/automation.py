@@ -7,8 +7,11 @@ DO NOT expose these in the public API docs.
 from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from typing import Optional
+from dotenv import load_dotenv
 import os
 import logging
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/automation", tags=["automation"])
