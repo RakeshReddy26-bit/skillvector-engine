@@ -13,11 +13,9 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/automation", tags=["automation"])
 
-AUTOMATION_KEY = os.getenv("AUTOMATION_API_KEY")
-
-
-def verify_atlas(x_atlas_key: str = Header(...)):
-    if not AUTOMATION_KEY or x_atlas_key != AUTOMATION_KEY:
+def verify_atlas(x_atlas_key: str = Header(None)):
+    expected = os.getenv("AUTOMATION_API_KEY", "")
+    if not expected or x_atlas_key != expected:
         raise HTTPException(status_code=403, detail="Unauthorized")
     return True
 
