@@ -3,6 +3,8 @@ import os
 import time
 import uuid
 
+from neo4j import GraphDatabase
+
 from src.engine.skill_gap_engine import SkillGapEngine
 from src.graph.skill_planner import SkillPlanner
 from src.evidence.evidence_engine import EvidenceEngine
@@ -98,6 +100,34 @@ class SkillVectorPipeline:
         except Exception as e:
             logger.error("Job retrieval pipeline failed: %s", e)
             return []
+
+    def get_learning_path_from_neo4j(self, missing_skills: list) -> list:
+        """Build a learning path directly from Neo4j using the official driver."""
+        uri = os.getenv("NEO4J_URI")
+        user = os.getenv("NEO4J_USERNAME")
+        password = os.getenv("NEO4J_PASSWORD")
+
+        if not uri or not user or not password or not missing_skills:
+            return []
+
+        query = """
+        UNWIND $skills AS skill_name
+        OPTIONAL MATCH (s:Skill {name: skill_name})
+        OPTIONAL MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s)
+        RETURN skill_name AS skill, count(pre) AS prereq_count
+        ORDER BY prereq_count DESC, skill ASC
+        """
+
+        driver = GraphDatabase.driver(uri, auth=(user, password))
+        try:
+            with driver.session() as session:
+                records = session.run(query, skills=missing_skills)
+                return [
+                    {"skill": record["skill"], "estimated_weeks": 2, "estimated_days": 14}
+                    for record in records
+                ]
+        finally:
+            driver.close()
 
     def run(self, resume: str, target_job: str) -> dict:
         """Run the full analysis pipeline.
