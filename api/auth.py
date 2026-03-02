@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Authentication endpoints for SkillVector API."""
 
 import logging
@@ -43,7 +44,7 @@ def create_token(user_id: str, email: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def decode_token(token: str) -> dict | None:
+def decode_token(token: str) -> Optional[dict]:
     """Decode and verify a JWT token. Returns payload or None."""
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -51,7 +52,7 @@ def decode_token(token: str) -> dict | None:
         return None
 
 
-def get_current_user(request: Request) -> dict | None:
+def get_current_user(request: Request) -> Optional[dict]:
     """Extract user from Authorization header. Returns None if not authenticated."""
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):

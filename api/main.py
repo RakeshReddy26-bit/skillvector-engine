@@ -10,6 +10,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +21,7 @@ from api.middleware import check_usage_limit, get_optional_user
 from api.models import AnalyzeRequest, AnalyzeResponse, ErrorResponse, HealthResponse
 from api.stripe_routes import router as stripe_router
 from src.routes.automation import router as automation_router
+from src.routes.reports import router as reports_router
 from src.db.database import init_db
 from src.health import check_health
 from src.pipeline.full_pipeline import SkillVectorPipeline
@@ -30,8 +32,8 @@ from src.utils.validators import sanitize_text, validate_job_description, valida
 logger = logging.getLogger(__name__)
 
 # Module-level state populated during lifespan
-pipeline: SkillVectorPipeline | None = None
-rate_limiter: RateLimiter | None = None
+pipeline: Optional[SkillVectorPipeline] = None
+rate_limiter: Optional[RateLimiter] = None
 
 
 @asynccontextmanager
@@ -77,6 +79,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(stripe_router)
 app.include_router(automation_router)
+app.include_router(reports_router)
 
 
 @app.get("/health", response_model=HealthResponse)

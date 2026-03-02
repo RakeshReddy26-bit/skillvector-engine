@@ -1,3 +1,4 @@
+from typing import Optional, List
 """Evaluation rubric engine for SkillVector Engine.
 
 Generates assessment criteria for portfolio projects so candidates
@@ -332,7 +333,7 @@ class RubricEngine:
     def generate(
         self,
         missing_skills: list[str],
-        project_context: list[dict] | None = None,
+        project_context: Optional[List[dict]] = None,
     ) -> list[dict]:
         """Generate rubrics for each missing skill.
 

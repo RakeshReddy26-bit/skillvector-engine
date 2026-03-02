@@ -35,6 +35,7 @@ export default function Home() {
   const { user, refreshUser } = useAuth();
   const [result, setResult] = useState<DisplayResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [showAuth, setShowAuth] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -99,6 +100,36 @@ export default function Home() {
     setResult(DEMO_RESULT);
     scrollToResults();
   }, [scrollToResults]);
+
+  const downloadReport = useCallback(async () => {
+    if (!result) return;
+
+    try {
+      setDownloading(true);
+      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skill-vector.com";
+      const response = await fetch(`${apiBase}/reports/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result),
+      });
+
+      if (!response.ok) throw new Error("PDF generation failed");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "skillevector_report.pdf";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Download failed:", err);
+    } finally {
+      setDownloading(false);
+    }
+  }, [result]);
 
   return (
     <>
@@ -202,6 +233,16 @@ export default function Home() {
         {/* Results — show when data exists */}
         {result && !isLoading && (
           <div id="results-section" ref={resultsRef}>
+            <div className="results-header-row">
+              <h2 className="results-title">Analysis Results</h2>
+              <button
+                onClick={downloadReport}
+                disabled={downloading}
+                className="download-btn"
+              >
+                {downloading ? "Generating..." : "Download PDF Report"}
+              </button>
+            </div>
 
             {/* PANEL 01 — SCORE */}
             <section className="panel">

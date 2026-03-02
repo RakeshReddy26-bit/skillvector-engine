@@ -1,6 +1,7 @@
 """Optional auth dependency and usage limit checking for SkillVector API."""
 
 import logging
+from typing import Optional
 
 from fastapi import Request
 
@@ -10,12 +11,12 @@ from src.db.models import UserRepository
 logger = logging.getLogger(__name__)
 
 
-def get_optional_user(request: Request) -> dict | None:
+def get_optional_user(request: Request) -> Optional[dict]:
     """Dependency: returns user dict if authenticated, None otherwise."""
     return get_current_user(request)
 
 
-def check_usage_limit(user: dict | None) -> tuple[bool, str]:
+def check_usage_limit(user: Optional[dict]) -> tuple[bool, str]:
     """Check if the user has remaining analyses.
 
     Returns (allowed, error_message).

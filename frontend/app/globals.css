@@ -66,6 +66,20 @@ body::after {
 
 #results-section { margin-top: 60px; }
 
+.results-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.results-title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 .panel {
   margin-bottom: 60px;
   animation: fadeUp 0.6s ease both;
@@ -157,6 +171,35 @@ body::after {
 .chip { font-size: 10px; padding: 2px 8px; background: #141b24; border: 1px solid rgba(255,255,255,0.07); border-radius: 2px; color: #5a6478; font-family: 'DM Mono', monospace; }
 .arrow { color: #5a6478; transition: all 0.2s; }
 .job-row:hover .arrow { color: #00e5a0; transform: translateX(4px); }
+
+.download-btn {
+  padding: 12px 24px;
+  background: #00e5a0;
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: monospace;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.download-btn:hover {
+  background: #00ffb3;
+  transform: translateY(-2px);
+}
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+@media (max-width: 768px) {
+  .results-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
 
 /* Jobs — rich card (RAG + Claude scored) */
 .job-card-rich {

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 
 from src.llm.gap_agent import SkillGapAgent
@@ -49,7 +50,7 @@ class SkillGapEngine:
             "missing_skills": missing_skills,
         }
 
-    def _compute_embedding_score(self, resume_text: str, job_text: str) -> float | None:
+    def _compute_embedding_score(self, resume_text: str, job_text: str) -> Optional[float]:
         """Compute cosine similarity between resume and job embeddings."""
         try:
             service = self._get_embedding_service()
