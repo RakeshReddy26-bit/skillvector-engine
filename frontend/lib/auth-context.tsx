@@ -16,7 +16,8 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-const TOKEN_KEY = "sv_token";
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -31,6 +32,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(TOKEN_KEY, t);
     } else {
       localStorage.removeItem(TOKEN_KEY);
+    }
+  }, []);
+
+  const persistUser = useCallback((u: UserInfo | null) => {
+    setUser(u);
+    if (u) {
+      localStorage.setItem(USER_KEY, JSON.stringify(u));
+    } else {
+      localStorage.removeItem(USER_KEY);
     }
   }, []);
 
@@ -55,9 +65,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(TOKEN_KEY, oauthToken);
       api
         .getMe()
-        .then((u) => setUser(u))
+        .then((u) => persistUser(u))
         .catch(() => {
           persistToken(null);
+          persistUser(null);
         })
         .finally(() => setIsLoading(false));
       return;
@@ -72,46 +83,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(stored);
     api
       .getMe()
-      .then((u) => setUser(u))
+      .then((u) => persistUser(u))
       .catch(() => {
         // Token expired or invalid
         persistToken(null);
+        persistUser(null);
       })
       .finally(() => setIsLoading(false));
-  }, [persistToken]);
+  }, [persistToken, persistUser]);
 
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await api.login(email, password);
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
       persistToken(res.token);
-      setUser(res.user);
+      persistUser(res.user);
     },
-    [persistToken],
+    [persistToken, persistUser],
   );
 
   const register = useCallback(
     async (email: string, password: string) => {
       const res = await api.register(email, password);
       persistToken(res.token);
-      setUser(res.user);
+      persistUser(res.user);
     },
-    [persistToken],
+    [persistToken, persistUser],
   );
 
   const logout = useCallback(() => {
     persistToken(null);
-    setUser(null);
-  }, [persistToken]);
+    persistUser(null);
+  }, [persistToken, persistUser]);
 
   const refreshUser = useCallback(async () => {
     if (!token) return;
     try {
       const u = await api.getMe();
-      setUser(u);
+      persistUser(u);
     } catch {
       // Ignore — stale token handled on next action
     }
-  }, [token]);
+  }, [persistUser, token]);
 
   return (
     <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, refreshUser }}>

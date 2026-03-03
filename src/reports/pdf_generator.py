@@ -6,6 +6,7 @@ Uses reportlab canvas for precise pixel-perfect layout
 import io
 from datetime import datetime
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import mm
@@ -100,15 +101,20 @@ def draw_score_ring(c, cx, cy, score, col):
 
     # Score text inside
     c.setFillColor(col)
-    c.setFont("Helvetica-Bold", 18)
+    score_font = "Helvetica-Bold"
+    score_size = 28
+    c.setFont(score_font, score_size)
     score_txt = f"{score}%"
-    tw = c.stringWidth(score_txt, "Helvetica-Bold", 18)
-    c.drawString(cx - tw / 2, cy + 2, score_txt)
+    face = pdfmetrics.getFont(score_font).face
+    ascent = (face.ascent / 1000.0) * score_size
+    descent = (face.descent / 1000.0) * score_size
+    score_y = cy - ((ascent + descent) / 2.0)
+    c.drawCentredString(cx, score_y, score_txt)
 
     c.setFillColor(C_MUTED)
-    c.setFont("Helvetica", 6)
-    lw = c.stringWidth("MATCH", "Helvetica", 6)
-    c.drawString(cx - lw / 2, cy - 10, "MATCH")
+    c.setFont("Helvetica", 7)
+    score_bottom = score_y + descent
+    c.drawCentredString(cx, score_bottom - 10, "MATCH")
 
 
 def truncate(text, max_chars):
@@ -120,7 +126,7 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     c = canvas.Canvas(buffer, pagesize=A4)
 
     score        = analysis_result.get("match_score", 0)
-    target_role  = analysis_result.get("target_role", "Target Role")
+    target_role  = analysis_result.get("target_role", "")
     missing      = analysis_result.get("missing_skills", [])
     learning     = analysis_result.get("learning_path", [])
     evidence     = analysis_result.get("evidence", [])
@@ -128,6 +134,7 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     req_id       = analysis_result.get("request_id", "-")
     latency      = analysis_result.get("latency_ms", 0)
     generated    = datetime.now().strftime("%d %b %Y  %H:%M")
+    generated_card = datetime.now().strftime("%B %d, %Y")
     sc           = score_color(score)
 
     margin = 22
@@ -156,7 +163,7 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
                       r=4, fill=colors.HexColor("#0a2a1f"))
     c.setFillColor(C_ACCENT)
     c.setFont("Helvetica-Bold", 7)
-    c.drawString(W - margin - 68, H - 39, "v3.0  PRODUCTION")
+    c.drawCentredString(W - margin - 45, H - 39, "v3.0  PRODUCTION")
 
     y = H - header_h - 16
 
@@ -175,14 +182,16 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     c.setFont("Helvetica-Bold", 10)
     c.drawString(margin + 112, y - 22, label.upper())
     c.setFillColor(C_TEXT)
-    c.setFont("Helvetica-Bold", 13)
+    c.setFont("Helvetica-Bold", 14)
     c.drawString(margin + 112, y - 38, truncate(target_role, 38))
     c.setFillColor(C_MUTED)
     c.setFont("Helvetica", 8)
     c.drawString(margin + 112, y - 52,
-                 f"{len(missing)} skill gaps identified   .   Analyzed in {latency/1000:.1f}s   .   Powered by Claude Sonnet")
+                 "Resume analyzed against job requirements")
+    c.drawString(margin + 112, y - 62,
+                 f"Analyzed on {generated_card}   .   {len(missing)} skill gaps   .   {latency/1000:.1f}s")
     chip_x = margin + 112
-    chip_y = y - 70
+    chip_y = y - 78
     for skill_item in missing[:5]:
         sname = skill_item.get("skill", str(skill_item)) if isinstance(skill_item, dict) else str(skill_item)
         sname = truncate(sname, 14)
@@ -211,29 +220,36 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     c.setLineWidth(0.5)
     c.line(left_x + 72, y + 4, left_x + col_w, y + 4)
 
+    skill_card_h = 44
+    skill_row_gap = 6
     sy = y - 14
     for skill_item in missing[:5]:
         sname = skill_item.get("skill", str(skill_item)) if isinstance(skill_item, dict) else str(skill_item)
         pri   = skill_item.get("priority", "MEDIUM") if isinstance(skill_item, dict) else "MEDIUM"
         why   = skill_item.get("why", "") if isinstance(skill_item, dict) else ""
         col   = priority_color(pri)
-        draw_rounded_rect(c, left_x, sy - 28, col_w, 32, r=5,
+        card_top = sy
+        card_y = card_top - skill_card_h
+        draw_rounded_rect(c, left_x, card_y, col_w, skill_card_h, r=5,
                           fill=C_SURFACE, stroke=C_BORDER)
         c.setFillColor(col)
-        c.rect(left_x, sy - 28, 3, 32, fill=1, stroke=0)
+        c.rect(left_x, card_y, 3, skill_card_h, fill=1, stroke=0)
         c.setFillColor(col)
         c.setFont("Helvetica-Bold", 8)
-        c.drawString(left_x + 8, sy - 8, truncate(sname, 26))
+        c.drawString(left_x + 8, card_top - 14, truncate(sname, 35))
         c.setFillColor(C_MUTED)
         c.setFont("Helvetica", 6.5)
-        c.drawString(left_x + 8, sy - 20, truncate(why, 52))
-        bw = c.stringWidth(pri, "Helvetica-Bold", 6) + 8
-        draw_rounded_rect(c, left_x + col_w - bw - 6, sy - 22, bw, 11,
+        c.drawString(left_x + 8, card_top - 26, truncate(why, 65))
+        bw = c.stringWidth(pri, "Helvetica-Bold", 6) + 16
+        badge_h = 11
+        badge_y = card_y + (skill_card_h - badge_h) / 2
+        badge_x = left_x + col_w - bw - 8
+        draw_rounded_rect(c, badge_x, badge_y, bw, badge_h,
                           r=3, fill=col)
         c.setFillColor(C_BG)
         c.setFont("Helvetica-Bold", 6)
-        c.drawString(left_x + col_w - bw - 2, sy - 15, pri)
-        sy -= 38
+        c.drawCentredString(badge_x + bw / 2, badge_y + 2.5, pri)
+        sy -= skill_card_h + skill_row_gap
 
     # RIGHT COL: LEARNING PATH
     c.setFillColor(C_ACCENT)
@@ -243,15 +259,19 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     c.setLineWidth(0.5)
     c.line(right_x + 100, y + 4, right_x + col_w, y + 4)
 
+    learning_card_h = 44
+    learning_row_gap = 6
     ly = y - 14
     for i, step in enumerate(learning[:5]):
         sname = step.get("skill", str(step)) if isinstance(step, dict) else str(step)
         dur   = step.get("duration", "") if isinstance(step, dict) else ""
         desc  = step.get("description", "") if isinstance(step, dict) else ""
-        draw_rounded_rect(c, right_x, ly - 28, col_w, 32, r=5,
+        card_top = ly
+        card_y = card_top - learning_card_h
+        draw_rounded_rect(c, right_x, card_y, col_w, learning_card_h, r=5,
                           fill=C_SURFACE, stroke=C_BORDER)
         cx2 = right_x + 14
-        cy2 = ly - 14
+        cy2 = card_y + learning_card_h / 2
         c.setFillColor(C_ACCENT)
         c.circle(cx2, cy2, 8, fill=1, stroke=0)
         c.setFillColor(C_BG)
@@ -261,20 +281,24 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
         if i < len(learning[:5]) - 1:
             c.setStrokeColor(C_BORDER)
             c.setLineWidth(0.8)
-            c.line(right_x + 14, ly - 28, right_x + 14, ly - 38)
+            next_card_top = ly - (learning_card_h + learning_row_gap)
+            c.line(right_x + 14, card_y, right_x + 14, next_card_top)
         c.setFillColor(C_TEXT)
         c.setFont("Helvetica-Bold", 8)
-        c.drawString(right_x + 28, ly - 8, truncate(sname, 24))
+        c.drawString(right_x + 28, card_top - 14, truncate(sname, 24))
         c.setFillColor(C_MUTED)
         c.setFont("Helvetica", 6.5)
-        c.drawString(right_x + 28, ly - 20, truncate(desc, 38))
+        c.drawString(right_x + 28, card_top - 26, truncate(desc, 38))
         dw = c.stringWidth(dur, "Helvetica-Bold", 6) + 8
-        draw_rounded_rect(c, right_x + col_w - dw - 4, ly - 22, dw, 11,
+        badge_h = 11
+        badge_y = card_y + (learning_card_h - badge_h) / 2
+        badge_x = right_x + col_w - dw - 8
+        draw_rounded_rect(c, badge_x, badge_y, dw, badge_h,
                           r=3, fill=colors.HexColor("#0a2a1f"), stroke=C_ACCENT, stroke_width=0.5)
         c.setFillColor(C_ACCENT)
         c.setFont("Helvetica-Bold", 6)
-        c.drawString(right_x + col_w - dw, ly - 15, dur)
-        ly -= 38
+        c.drawCentredString(badge_x + dw / 2, badge_y + 2.5, dur)
+        ly -= learning_card_h + learning_row_gap
 
     y = min(sy, ly) - 14
 
@@ -301,21 +325,21 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
         c.setFillColor(C_BORDER)
         c.rect(ex, ecy - 54, ew, 2, fill=1, stroke=0)
         tw2 = c.stringWidth(skill, "Helvetica-Bold", 6) + 8
-        draw_rounded_rect(c, ex + 6, ecy - 12, tw2, 11,
+        draw_rounded_rect(c, ex + 8, ecy - 12, tw2, 11,
                           r=3, fill=colors.HexColor("#1a1040"), stroke=C_PURPLE, stroke_width=0.5)
         c.setFillColor(C_PURPLE)
         c.setFont("Helvetica-Bold", 6)
-        c.drawString(ex + 10, ecy - 5, skill)
+        c.drawString(ex + 12, ecy - 5, skill)
         c.setFillColor(C_TEXT)
         c.setFont("Helvetica-Bold", 8)
-        c.drawString(ex + 6, ecy - 24, truncate(ptitle, 28))
+        c.drawString(ex + 8, ecy - 24, truncate(ptitle, 38))
         c.setFillColor(C_MUTED)
         c.setFont("Helvetica", 6.5)
-        c.drawString(ex + 6, ecy - 35, truncate(pdesc, 40))
+        c.drawString(ex + 8, ecy - 35, truncate(pdesc, 40))
         dtext = "  .  ".join([truncate(d, 16) for d in deliv[:2]])
         c.setFillColor(C_MUTED)
         c.setFont("Helvetica", 6)
-        c.drawString(ex + 6, ecy - 46, truncate(dtext, 50))
+        c.drawString(ex + 8, ecy - 46, truncate(dtext, 50))
 
     y -= 140
 

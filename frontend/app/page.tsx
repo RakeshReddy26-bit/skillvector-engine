@@ -107,9 +107,13 @@ export default function Home() {
     try {
       setDownloading(true);
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skill-vector.com";
+      const token = localStorage.getItem("token");
       const response = await fetch(`${apiBase}/reports/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token ?? ""}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(result),
       });
 

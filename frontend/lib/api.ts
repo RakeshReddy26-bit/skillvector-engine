@@ -66,9 +66,11 @@ class ApiClient {
   }
 
   private authHeaders(json = true): Record<string, string> {
-    const h: Record<string, string> = {};
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : this.token;
+    const h: Record<string, string> = {
+      Authorization: `Bearer ${token ?? ""}`,
+    };
     if (json) h["Content-Type"] = "application/json";
-    if (this.token) h["Authorization"] = `Bearer ${this.token}`;
     return h;
   }
 
@@ -76,6 +78,7 @@ class ApiClient {
 
   async health(): Promise<HealthResponse> {
     const res = await fetch(`${this.base}/health`, {
+      headers: this.authHeaders(),
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) throw new Error(`Health check failed: ${res.status}`);

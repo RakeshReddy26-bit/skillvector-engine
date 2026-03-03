@@ -31,6 +31,17 @@ from src.utils.validators import sanitize_text, validate_job_description, valida
 
 logger = logging.getLogger(__name__)
 
+# Optional parser dependencies used by file upload extraction.
+try:
+    import pdfplumber
+except Exception:  # pragma: no cover - environment dependent import
+    pdfplumber = None
+
+try:
+    import docx2txt
+except Exception:  # pragma: no cover - environment dependent import
+    docx2txt = None
+
 # Module-level state populated during lifespan
 pipeline: Optional[SkillVectorPipeline] = None
 rate_limiter: Optional[RateLimiter] = None
@@ -169,21 +180,86 @@ ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".jpg", ".jpeg", ".png"}
 def _extract_text_from_file(filename: str, content: bytes) -> str:
     """Extract text from uploaded file based on extension."""
     ext = Path(filename).suffix.lower()
+    file_size = len(content)
+    logger.info(
+        "Starting file extraction: filename=%s extension=%s size_bytes=%d",
+        filename,
+        ext,
+        file_size,
+    )
+
+    if file_size == 0:
+        raise ValueError("Uploaded file is empty.")
 
     if ext == ".txt":
-        return content.decode("utf-8", errors="replace")
+        try:
+            text = content.decode("utf-8", errors="replace")
+        except Exception as e:
+            logger.exception(
+                "TXT extraction failed: filename=%s error_type=%s error=%s",
+                filename,
+                type(e).__name__,
+                e,
+            )
+            raise ValueError(f"Failed to decode TXT file: {e}") from e
+        if not text.strip():
+            raise ValueError("TXT file contains no readable text.")
+        return text
 
     if ext == ".pdf":
-        import pdfplumber
+        if pdfplumber is None:
+            raise ValueError("PDF extraction dependency is unavailable: pdfplumber is not installed.")
+        try:
+            with pdfplumber.open(io.BytesIO(content)) as pdf:
+                page_texts = []
+                for idx, page in enumerate(pdf.pages, start=1):
+                    try:
+                        page_texts.append(page.extract_text() or "")
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to extract PDF page text: filename=%s page=%d error_type=%s error=%s",
+                            filename,
+                            idx,
+                            type(e).__name__,
+                            e,
+                        )
+                        page_texts.append("")
+        except Exception as e:
+            error_message = str(e)
+            error_type = type(e).__name__
+            logger.exception(
+                "PDF extraction failed: filename=%s error_type=%s error=%s",
+                filename,
+                error_type,
+                error_message,
+            )
+            if "password" in error_message.lower() or "encrypted" in error_message.lower():
+                raise ValueError("PDF is password-protected or encrypted and cannot be read.") from e
+            raise ValueError(f"Failed to parse PDF file: {error_type}: {error_message}") from e
 
-        with pdfplumber.open(io.BytesIO(content)) as pdf:
-            pages = [p.extract_text() or "" for p in pdf.pages]
-        return "\n".join(pages)
+        text = "\n".join(page_texts).strip()
+        if not text:
+            raise ValueError(
+                "PDF was parsed but no readable text was found (it may contain only scanned images or empty pages)."
+            )
+        return text
 
     if ext == ".docx":
-        import docx2txt
-
-        return docx2txt.process(io.BytesIO(content))
+        if docx2txt is None:
+            raise ValueError("DOCX extraction dependency is unavailable: docx2txt is not installed.")
+        try:
+            text = docx2txt.process(io.BytesIO(content))
+        except Exception as e:
+            logger.exception(
+                "DOCX extraction failed: filename=%s error_type=%s error=%s",
+                filename,
+                type(e).__name__,
+                e,
+            )
+            raise ValueError(f"Failed to parse DOCX file: {e}") from e
+        if not text or not text.strip():
+            raise ValueError("DOCX file contains no readable text.")
+        return text
 
     if ext in {".jpg", ".jpeg", ".png"}:
         try:
@@ -196,6 +272,14 @@ def _extract_text_from_file(filename: str, content: bytes) -> str:
             raise ValueError(
                 "Image OCR requires pytesseract and Tesseract to be installed."
             )
+        except Exception as e:
+            logger.exception(
+                "Image OCR extraction failed: filename=%s error_type=%s error=%s",
+                filename,
+                type(e).__name__,
+                e,
+            )
+            raise ValueError(f"Failed to extract text from image file: {e}") from e
 
     raise ValueError(f"Unsupported file type: {ext}")
 
@@ -233,6 +317,11 @@ async def upload_resume(
     # 2. Validate file
     if not file.filename:
         return JSONResponse(status_code=400, content={"error": "No file provided."})
+    logger.info(
+        "Received upload request: filename=%s content_type=%s",
+        file.filename,
+        file.content_type,
+    )
     ext = Path(file.filename).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
         return JSONResponse(
@@ -243,12 +332,32 @@ async def upload_resume(
     # 3. Extract text
     try:
         content = await file.read()
+        logger.info(
+            "Read uploaded file bytes: filename=%s content_type=%s size_bytes=%d",
+            file.filename,
+            file.content_type,
+            len(content),
+        )
         resume = _extract_text_from_file(file.filename, content)
     except ValueError as e:
+        logger.warning(
+            "File extraction validation error: filename=%s error_type=%s error=%s",
+            file.filename,
+            type(e).__name__,
+            e,
+        )
         return JSONResponse(status_code=400, content={"error": str(e)})
-    except Exception:
-        logger.exception("File extraction error")
-        return JSONResponse(status_code=400, content={"error": "Could not read file."})
+    except Exception as e:
+        logger.exception(
+            "Unexpected file extraction error: filename=%s error_type=%s error=%s",
+            file.filename,
+            type(e).__name__,
+            e,
+        )
+        return JSONResponse(
+            status_code=400,
+            content={"error": f"Could not read file: {type(e).__name__}: {e}"},
+        )
 
     # 4. Sanitize + validate
     resume = sanitize_text(resume)
