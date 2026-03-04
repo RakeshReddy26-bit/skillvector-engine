@@ -1,4 +1,4 @@
-import type { AnalysisHistoryItem, AnalyzeRequest, AnalyzeResponse, AuthResponse, DisplayResult, HealthResponse, UserInfo } from "./types";
+import type { AnalysisHistoryItem, AnalyzeRequest, AnalyzeResponse, AuthResponse, DashboardHistory, DashboardStats, DisplayResult, HealthResponse, UserInfo } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skill-vector.com";
 
@@ -209,6 +209,33 @@ class ApiClient {
     });
     if (!res.ok) throw new Error("Failed to load history");
     return res.json() as Promise<AnalysisHistoryItem[]>;
+  }
+
+  // ── Dashboard ──────────────────────────────────────────────────────
+
+  async getDashboardHistory(): Promise<DashboardHistory> {
+    const res = await fetch(`${this.base}/dashboard/history`, {
+      headers: this.authHeaders(),
+    });
+    if (!res.ok) throw new Error("Failed to load dashboard history");
+    return res.json() as Promise<DashboardHistory>;
+  }
+
+  async getDashboardStats(): Promise<DashboardStats> {
+    const res = await fetch(`${this.base}/dashboard/stats`, {
+      headers: this.authHeaders(),
+    });
+    if (!res.ok) throw new Error("Failed to load dashboard stats");
+    return res.json() as Promise<DashboardStats>;
+  }
+
+  async deleteAnalysis(analysisId: string): Promise<{ status: string }> {
+    const res = await fetch(`${this.base}/dashboard/history/${analysisId}`, {
+      method: "DELETE",
+      headers: this.authHeaders(),
+    });
+    if (!res.ok) throw new Error("Failed to delete analysis");
+    return res.json() as Promise<{ status: string }>;
   }
 }
 

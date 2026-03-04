@@ -197,6 +197,23 @@ class AnalysisRepository:
         finally:
             conn.close()
 
+    def delete_analysis(self, user_id: str, analysis_id: str) -> bool:
+        """Delete an analysis belonging to a user."""
+        conn = get_connection()
+        try:
+            conn.execute(
+                "DELETE FROM analyses WHERE id = ? AND user_id = ?",
+                (analysis_id, user_id),
+            )
+            conn.commit()
+            logger.info("Deleted analysis %s for user %s", analysis_id, user_id)
+            return True
+        except Exception as e:
+            logger.error("Delete analysis error: %s", e)
+            return False
+        finally:
+            conn.close()
+
 
 class FeedbackRepository:
     """Data access for user feedback."""

@@ -16,6 +16,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import ProfilePanel from "@/components/ProfilePanel";
+import Dashboard from "@/components/Dashboard";
 import { ScoreRingSkeleton, GridSkeleton, SectionSkeleton } from "@/components/Skeleton";
 
 const TECH_STACK = [
@@ -40,6 +41,7 @@ export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const scrollToResults = useCallback(() => {
@@ -137,9 +139,9 @@ export default function Home() {
 
   return (
     <>
-      <HealthBanner onSignIn={() => setShowAuth(true)} onProfile={() => setShowProfile(true)} />
+      <HealthBanner onSignIn={() => setShowAuth(true)} onProfile={() => setShowProfile(true)} onDashboard={() => setShowDashboard(true)} />
 
-      {/* Auth, Paywall & Profile Modals */}
+      {/* Auth, Paywall, Profile & Dashboard Modals */}
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
       <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
       <ProfilePanel
@@ -147,6 +149,7 @@ export default function Home() {
         onClose={() => setShowProfile(false)}
         onUpgrade={() => { setShowProfile(false); setShowPaywall(true); }}
       />
+      {showDashboard && <Dashboard onClose={() => setShowDashboard(false)} />}
 
       <main className="max-w-7xl mx-auto px-6">
         {/* Hero */}

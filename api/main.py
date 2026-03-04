@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from api.auth import router as auth_router
+from api.dashboard import router as dashboard_router
 from api.middleware import check_usage_limit, get_optional_user
 from api.models import AnalyzeRequest, AnalyzeResponse, ErrorResponse, HealthResponse
 from api.stripe_routes import router as stripe_router
@@ -92,6 +93,7 @@ app.add_middleware(
 
 # Mount auth and stripe routers
 app.include_router(auth_router)
+app.include_router(dashboard_router)
 app.include_router(stripe_router)
 app.include_router(automation_router)
 app.include_router(reports_router)

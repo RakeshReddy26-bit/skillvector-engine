@@ -136,3 +136,35 @@ export interface AnalysisHistoryItem {
   missing_skills: string[];
   created_at: string;
 }
+
+// ── Dashboard types (v3) ─────────────────────────────────────────────────
+
+export interface DashboardAnalysis {
+  id: string;
+  match_score: number;
+  learning_priority?: string;
+  missing_skills: unknown[];
+  created_at: string;
+  detected_language?: string;
+  was_translated?: boolean;
+  result?: Record<string, unknown>;
+}
+
+export interface DashboardHistory {
+  analyses: DashboardAnalysis[];
+  total: number;
+  user: {
+    email: string;
+    plan_tier: string;
+    analyses_used: number;
+    analyses_limit: number;
+  };
+}
+
+export interface DashboardStats {
+  total_analyses: number;
+  avg_match_score: number;
+  best_match_score: number;
+  most_common_gap: string | null;
+  improvement: number;
+}
