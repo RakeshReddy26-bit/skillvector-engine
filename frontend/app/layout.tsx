@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "SkillVector — AI Career Intelligence Platform",
   description:
     "AI-powered skill gap analysis. Paste your resume, get a match score, learning path, evidence projects, and interview prep. Powered by Claude.",
+  icons: { icon: "/logo.png" },
   metadataBase: new URL("https://skill-vector.com"),
   openGraph: {
     title: "SkillVector — AI Career Intelligence Platform",

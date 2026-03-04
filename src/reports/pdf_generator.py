@@ -125,7 +125,7 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
 
-    score        = analysis_result.get("match_score", 0)
+    score        = round(analysis_result.get("match_score", 0))
     target_role  = analysis_result.get("target_role", "")
     missing      = analysis_result.get("missing_skills", [])
     learning     = analysis_result.get("learning_path", [])
@@ -264,7 +264,6 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     ly = y - 14
     for i, step in enumerate(learning[:5]):
         sname = step.get("skill", str(step)) if isinstance(step, dict) else str(step)
-        dur   = step.get("duration", "") if isinstance(step, dict) else ""
         desc  = step.get("description", "") if isinstance(step, dict) else ""
         card_top = ly
         card_y = card_top - learning_card_h
@@ -285,19 +284,10 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
             c.line(right_x + 14, card_y, right_x + 14, next_card_top)
         c.setFillColor(C_TEXT)
         c.setFont("Helvetica-Bold", 8)
-        c.drawString(right_x + 28, card_top - 14, truncate(sname, 24))
+        c.drawString(right_x + 28, card_top - 14, truncate(sname, 32))
         c.setFillColor(C_MUTED)
         c.setFont("Helvetica", 6.5)
-        c.drawString(right_x + 28, card_top - 26, truncate(desc, 38))
-        dw = c.stringWidth(dur, "Helvetica-Bold", 6) + 8
-        badge_h = 11
-        badge_y = card_y + (learning_card_h - badge_h) / 2
-        badge_x = right_x + col_w - dw - 8
-        draw_rounded_rect(c, badge_x, badge_y, dw, badge_h,
-                          r=3, fill=colors.HexColor("#0a2a1f"), stroke=C_ACCENT, stroke_width=0.5)
-        c.setFillColor(C_ACCENT)
-        c.setFont("Helvetica-Bold", 6)
-        c.drawCentredString(badge_x + dw / 2, badge_y + 2.5, dur)
+        c.drawString(right_x + 28, card_top - 26, truncate(desc, 45))
         ly -= learning_card_h + learning_row_gap
 
     y = min(sy, ly) - 14

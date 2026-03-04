@@ -49,8 +49,17 @@ export default function HealthBanner({ onSignIn, onProfile }: HealthBannerProps)
     <nav className="sticky top-0 z-50 border-b border-white/10 backdrop-blur-xl bg-bg/80">
       <div className="max-w-7xl mx-auto px-6 h-[60px] flex items-center justify-between">
         {/* Logo */}
-        <div className="text-lg font-extrabold tracking-tight">
-          Skill<span className="text-accent">Vector</span>
+        <div className="flex items-center min-w-0">
+          <img
+            src="/logo.png"
+            width={36}
+            height={36}
+            alt="SkillVector logo"
+            style={{ borderRadius: 8, marginRight: 10 }}
+          />
+          <div className="text-lg font-extrabold tracking-tight leading-none">
+            Skill<span className="text-accent">Vector</span>
+          </div>
         </div>
 
         {/* Version tag */}
