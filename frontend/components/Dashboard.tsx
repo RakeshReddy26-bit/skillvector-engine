@@ -240,7 +240,7 @@ export default function Dashboard({ onClose }: DashboardProps) {
                       )}
                     </div>
                     <p className="text-sm text-[#e8edf5] font-medium truncate">
-                      {analysis.result?.target_role ?? "Analysis"}
+                      {String(analysis.result?.target_role ?? "Analysis")}
                     </p>
                     <p className="font-mono text-[11px] text-[#5a6478]">
                       {date} &middot; {gapCount} skill gap{gapCount !== 1 ? "s" : ""}
