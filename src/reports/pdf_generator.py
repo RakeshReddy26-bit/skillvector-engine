@@ -202,6 +202,19 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     c.drawString(margin + 112, info_line_2_y,
                  f"Analyzed on {generated_card}   .   {len(missing)} skill gaps   .   {latency/1000:.1f}s")
 
+    # Language translation badge
+    lang = analysis_result.get("detected_language", "English")
+    translated = analysis_result.get("was_translated", False)
+    if translated:
+        badge_text = f"Translated from {lang}"
+        bw = c.stringWidth(badge_text, "Helvetica", 6) + 10
+        draw_rounded_rect(c, margin + 112, y - 68, bw, 12,
+                         r=3, fill=colors.HexColor("#1a1040"), 
+                         stroke=C_PURPLE, stroke_width=0.5)
+        c.setFillColor(C_PURPLE)
+        c.setFont("Helvetica", 6)
+        c.drawString(margin + 117, y - 62, badge_text)
+
     y -= card_h + 12
 
     # TWO COLUMN LAYOUT

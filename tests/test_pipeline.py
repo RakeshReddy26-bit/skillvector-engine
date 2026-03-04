@@ -5,6 +5,67 @@ from src.pipeline.full_pipeline import SkillVectorPipeline
 
 
 class TestSkillVectorPipeline:
+    @patch("src.pipeline.full_pipeline.save_cached_result")
+    @patch("src.pipeline.full_pipeline.get_cached_result")
+    @patch("src.pipeline.full_pipeline.SkillGapEngine")
+    def test_cache_hit_skips_skill_engine(self, mock_engine_cls, mock_get_cached, mock_save_cached):
+        resume_text = "resume " * 20
+        job_text = "job description " * 10
+        mock_engine = MagicMock()
+        mock_engine.analyze.return_value = {
+            "match_score": 60,
+            "priority": "Medium",
+            "missing_skills": ["Docker"],
+        }
+        mock_engine_cls.return_value = mock_engine
+        mock_get_cached.return_value = {
+            "match_score": 74,
+            "learning_priority": "Medium",
+            "missing_skills": ["Kubernetes"],
+            "learning_path": [],
+            "evidence": [],
+            "interview_prep": [],
+            "rubrics": [],
+            "related_jobs": [],
+            "cached": True,
+            "latency_ms": 0,
+            "request_id": "oldrequestid1",
+        }
+
+        pipeline = SkillVectorPipeline()
+        pipeline.skill_engine = mock_engine
+        result = pipeline.run(resume_text, job_text)
+
+        assert result["cached"] is True
+        assert result["latency_ms"] == 0
+        assert "request_id" in result
+        assert len(result["request_id"]) == 12
+        mock_engine.analyze.assert_not_called()
+        mock_save_cached.assert_not_called()
+
+    @patch("src.pipeline.full_pipeline.save_cached_result")
+    @patch("src.pipeline.full_pipeline.get_cached_result")
+    @patch("src.pipeline.full_pipeline.SkillGapEngine")
+    def test_cache_miss_runs_and_saves(self, mock_engine_cls, mock_get_cached, mock_save_cached):
+        resume_text = "resume " * 20
+        job_text = "job description " * 10
+        mock_engine = MagicMock()
+        mock_engine.analyze.return_value = {
+            "match_score": 65,
+            "priority": "Medium",
+            "missing_skills": ["Docker"],
+        }
+        mock_engine_cls.return_value = mock_engine
+        mock_get_cached.return_value = None
+
+        pipeline = SkillVectorPipeline()
+        pipeline.skill_engine = mock_engine
+        result = pipeline.run(resume_text, job_text)
+
+        assert result["cached"] is False
+        mock_engine.analyze.assert_called_once_with(resume_text, job_text)
+        mock_save_cached.assert_called_once()
+
     @patch("src.pipeline.full_pipeline.SkillGapEngine")
     def test_run_returns_all_keys(self, mock_engine_cls):
         mock_engine = MagicMock()

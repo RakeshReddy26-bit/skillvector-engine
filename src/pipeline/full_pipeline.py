@@ -5,6 +5,7 @@ import uuid
 
 from neo4j import GraphDatabase
 
+from src.cache.analysis_cache import get_cached_result, save_cached_result
 from src.engine.skill_gap_engine import SkillGapEngine
 from src.graph.skill_planner import SkillPlanner
 from src.evidence.evidence_engine import EvidenceEngine
@@ -141,6 +142,14 @@ class SkillVectorPipeline:
         model = os.getenv("LLM_MODEL", "claude-sonnet-4-20250514")
         logger.info("[%s] Starting SkillVector pipeline | model=%s", request_id, model)
 
+        should_use_cache = len(resume.strip()) >= 50 and len(target_job.strip()) >= 50
+        if should_use_cache:
+            cached_result = get_cached_result(resume, target_job)
+            if cached_result:
+                cached_result["request_id"] = request_id
+                logger.info("[%s] Returning cached analysis result", request_id)
+                return cached_result
+
         # 1. Skill gap analysis
         gap_result = self.skill_engine.analyze(resume, target_job)
         match_score = gap_result["match_score"]
@@ -199,6 +208,9 @@ class SkillVectorPipeline:
 
         latency_ms = round((time.monotonic() - start) * 1000)
         result["latency_ms"] = latency_ms
+        result["cached"] = False
+        if should_use_cache:
+            save_cached_result(resume, target_job, result)
         logger.info(
             "[%s] Pipeline complete | score=%.1f | priority=%s | missing=%d | model=%s | latency=%dms",
             request_id, match_score, learning_priority, len(missing_skills), model, latency_ms,

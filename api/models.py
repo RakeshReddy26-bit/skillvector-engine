@@ -21,6 +21,7 @@ class AnalyzeResponse(BaseModel):
     related_jobs: list[dict]
     request_id: str
     latency_ms: int
+    cached: bool = False
 
 
 class HealthResponse(BaseModel):

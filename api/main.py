@@ -6,12 +6,14 @@ Auth: JWT-based optional auth with usage limits (v3).
 """
 
 import io
+import json
 import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -28,6 +30,8 @@ from src.pipeline.full_pipeline import SkillVectorPipeline
 from src.utils.errors import SkillVectorError
 from src.utils.rate_limiter import RateLimiter
 from src.utils.validators import sanitize_text, validate_job_description, validate_resume
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -370,6 +374,15 @@ async def upload_resume(
     if not valid:
         return JSONResponse(status_code=422, content={"error": err})
 
+    # 4b. Detect and translate language if needed
+    from src.language.translator import process_resume_language
+    lang_result = process_resume_language(resume)
+    resume = lang_result["text"]
+    detected_language = lang_result["language_name"]
+    was_translated = lang_result["translated"]
+    if was_translated:
+        logger.info(f"Resume translated from {detected_language} to English")
+
     # 5. Check Anthropic key
     if not os.getenv("ANTHROPIC_API_KEY"):
         return JSONResponse(
@@ -379,7 +392,27 @@ async def upload_resume(
 
     # 6. Run pipeline
     try:
+        # === CACHE CHECK ===
+        from src.cache.analysis_cache import get_cached_result, save_cached_result
+        cached = get_cached_result(resume, job)
+        if cached:
+            logger.info("CACHE HIT - instant result returned")
+            return JSONResponse(content=cached)
+        logger.info("CACHE MISS - calling Claude pipeline")
+
+        # === PIPELINE CALL ===
         result = pipeline.run(resume, job)
+
+        # === CACHE SAVE ===
+        if result and isinstance(result, dict) and "match_score" in result:
+            save_cached_result(resume, job, result)
+            logger.info(f"CACHE SAVED - {len(json.dumps(result, default=str))} bytes")
+        else:
+            logger.warning(f"CACHE SKIP - result missing fields: {list(result.keys()) if result else 'None'}")
+
+        # Add language metadata to result
+        result["detected_language"] = detected_language
+        result["was_translated"] = was_translated
 
         # Save analysis for authenticated users
         if user:

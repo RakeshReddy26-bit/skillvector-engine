@@ -141,3 +141,84 @@ def test_analyze_rate_limiting(client):
     assert resp.status_code == 429
     data = resp.json()
     assert "Rate limit" in data["error"]
+
+
+# ── Upload resume caching ──────────────────────────────────────────────────
+
+
+@patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"})
+@patch("src.cache.analysis_cache.get_cached_result")
+@patch("src.cache.analysis_cache.save_cached_result")
+@patch("api.main._extract_text_from_file")
+def test_upload_resume_cache_hit_returns_cached(
+    mock_extract,
+    mock_save_cache,
+    mock_get_cache,
+    client,
+):
+    mock_extract.return_value = VALID_RESUME
+    mock_get_cache.return_value = {
+        "match_score": 74,
+        "learning_priority": "Medium",
+        "missing_skills": [],
+        "learning_path": [],
+        "evidence": [],
+        "interview_prep": [],
+        "rubrics": [],
+        "related_jobs": [],
+        "request_id": "cached123456",
+        "latency_ms": 0,
+        "cached": True,
+    }
+
+    resp = client.post(
+        "/upload-resume",
+        files={"file": ("resume.pdf", b"%PDF-1.4 test", "application/pdf")},
+        data={"target_job": VALID_JOB},
+    )
+
+    assert resp.status_code == 200
+    payload = resp.json()
+    assert payload["cached"] is True
+    assert payload["latency_ms"] == 0
+    client._mock_pipeline.run.assert_not_called()
+    mock_save_cache.assert_not_called()
+
+
+@patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"})
+@patch("src.cache.analysis_cache.get_cached_result")
+@patch("src.cache.analysis_cache.save_cached_result")
+@patch("api.main._extract_text_from_file")
+def test_upload_resume_cache_miss_runs_pipeline_and_saves(
+    mock_extract,
+    mock_save_cache,
+    mock_get_cache,
+    client,
+):
+    mock_extract.return_value = VALID_RESUME
+    mock_get_cache.return_value = None
+    client._mock_pipeline.run.return_value = {
+        "match_score": 72.5,
+        "learning_priority": "Medium",
+        "missing_skills": ["Docker"],
+        "learning_path": [{"skill": "Docker", "estimated_weeks": 2, "estimated_days": 14}],
+        "evidence": [{"skill": "Docker", "project": "Dockerize App", "description": "Build it", "deliverables": ["Dockerfile"], "estimated_weeks": 2}],
+        "interview_prep": [{"skill": "Docker", "questions": ["What is Docker?"], "difficulty": "Foundational", "tips": ["Practice"]}],
+        "rubrics": [{"skill": "Docker", "criteria": [], "scoring": {}, "total_points": 100}],
+        "related_jobs": [{"score": 0.85, "job_title": "DevOps Engineer", "company": "Acme", "skills": ["Docker"], "chunk": ""}],
+        "request_id": "abc123",
+        "latency_ms": 1500,
+        "cached": False,
+    }
+
+    resp = client.post(
+        "/upload-resume",
+        files={"file": ("resume.pdf", b"%PDF-1.4 test", "application/pdf")},
+        data={"target_job": VALID_JOB},
+    )
+
+    assert resp.status_code == 200
+    payload = resp.json()
+    assert payload["cached"] is False
+    client._mock_pipeline.run.assert_called_once_with(VALID_RESUME, VALID_JOB)
+    mock_save_cache.assert_called_once()
