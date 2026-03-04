@@ -76,18 +76,21 @@ app = FastAPI(
 
 # CORS — production + local dev
 ALLOWED_ORIGINS = [
-    "https://rakeshreddy26-bit.github.io",
-    "https://skill-vector.com",
-    "http://localhost:8000",
     "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://skill-vector.com",
+    "https://www.skill-vector.com",
+    "https://skillvector-engine.vercel.app",
+    "https://rakeshreddy26-bit.github.io",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
 
