@@ -127,6 +127,8 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
 
     score        = round(analysis_result.get("match_score", 0))
     target_role  = analysis_result.get("target_role", "")
+    candidate_info = analysis_result.get("candidate_info", {})
+    full_name    = candidate_info.get("full_name", "") if isinstance(candidate_info, dict) else ""
     missing      = analysis_result.get("missing_skills", [])
     learning     = analysis_result.get("learning_path", [])
     evidence     = analysis_result.get("evidence", [])
@@ -184,26 +186,21 @@ def generate_pdf_report(analysis_result: dict) -> bytes:
     c.setFillColor(C_TEXT)
     c.setFont("Helvetica-Bold", 14)
     c.drawString(margin + 112, y - 38, truncate(target_role, 38))
+    if full_name:
+        c.setFillColor(C_TEXT)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(margin + 112, y - 50, truncate(full_name, 38))
+        info_line_1_y = y - 62
+        info_line_2_y = y - 72
+    else:
+        info_line_1_y = y - 52
+        info_line_2_y = y - 62
     c.setFillColor(C_MUTED)
     c.setFont("Helvetica", 8)
-    c.drawString(margin + 112, y - 52,
+    c.drawString(margin + 112, info_line_1_y,
                  "Resume analyzed against job requirements")
-    c.drawString(margin + 112, y - 62,
+    c.drawString(margin + 112, info_line_2_y,
                  f"Analyzed on {generated_card}   .   {len(missing)} skill gaps   .   {latency/1000:.1f}s")
-    chip_x = margin + 112
-    chip_y = y - 78
-    for skill_item in missing[:5]:
-        sname = skill_item.get("skill", str(skill_item)) if isinstance(skill_item, dict) else str(skill_item)
-        sname = truncate(sname, 14)
-        pri   = skill_item.get("priority", "LOW") if isinstance(skill_item, dict) else "LOW"
-        col   = priority_color(pri)
-        sw    = c.stringWidth(sname, "Helvetica", 7) + 12
-        draw_rounded_rect(c, chip_x, chip_y - 2, sw, 13, r=3,
-                          fill=colors.HexColor("#0d1117"), stroke=col, stroke_width=0.7)
-        c.setFillColor(col)
-        c.setFont("Helvetica", 7)
-        c.drawString(chip_x + 6, chip_y + 4, sname)
-        chip_x += sw + 6
 
     y -= card_h + 12
 
