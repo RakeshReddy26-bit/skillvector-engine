@@ -6,7 +6,7 @@
 
 **Deterministic skill gap analysis. Real evidence projects. Prerequisite-ordered learning paths. Geo-localized monetization. Built 100% by one developer.**
 
-[![Live App](https://img.shields.io/badge/Live-skill--vector.com-00e5a0?style=for-the-badge&logo=vercel)](https://skill-vector.com)
+[![Live App](https://img.shields.io/badge/Live-skill--vector.com-00e5a0?style=for-the-badge&logo=railway)](https://skill-vector.com)
 [![API](https://img.shields.io/badge/API-api.skill--vector.com-blue?style=for-the-badge&logo=fastapi)](https://api.skill-vector.com/health)
 [![Tests](https://img.shields.io/badge/Tests-152_passing-success?style=for-the-badge&logo=pytest)](https://github.com/RakeshReddy26-bit/skillvector-engine)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)](https://python.org)
@@ -342,7 +342,6 @@ skillvector-engine/
 │
 ├── railway.json                        # Railway backend deployment config
 ├── Procfile                            # Process definition (uvicorn)
-├── render.yaml                         # Render service config (alternative)
 ├── requirements.txt                    # Production Python dependencies (40 packages)
 ├── requirements-dev.txt                # Dev dependencies (pytest, ruff, mypy)
 ├── pyproject.toml                      # Build/tool config

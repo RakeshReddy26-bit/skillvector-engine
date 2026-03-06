@@ -81,8 +81,6 @@ ALLOWED_ORIGINS = [
     "http://localhost:3002",
     "https://skill-vector.com",
     "https://www.skill-vector.com",
-    "https://skillvector-engine.vercel.app",
-    "https://skillvector-engine-git-main.vercel.app",
 ]
 
 app.add_middleware(
@@ -439,9 +437,9 @@ async def upload_resume(
         )
 
 
-# ── Redirect root to Vercel frontend ─────────────────────────────────────
+# ── Redirect root to frontend ────────────────────────────────────────────
 
 @app.get("/", include_in_schema=False)
 def frontend():
-    """Redirect to the Vercel frontend."""
+    """Redirect to the Railway frontend."""
     return RedirectResponse(url="https://skill-vector.com")

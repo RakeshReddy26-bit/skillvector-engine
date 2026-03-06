@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
-import { Analytics } from "@vercel/analytics/next";
+
 
 export const metadata: Metadata = {
   title: "SkillVector — AI Career Intelligence Platform",
@@ -41,7 +41,6 @@ export default function RootLayout({
         <div className="fixed -top-52 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-accent/[0.07] blur-3xl pointer-events-none z-0" />
         <div className="relative z-10">
           <AuthProvider>{children}</AuthProvider>
-          <Analytics />
         </div>
       </body>
     </html>
