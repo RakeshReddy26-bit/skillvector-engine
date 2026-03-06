@@ -109,15 +109,15 @@ def test_analyze_rejects_missing_fields(client):
 # ── CORS ────────────────────────────────────────────────────────────────────
 
 
-def test_cors_allows_github_pages(client):
+def test_cors_allows_production_origin(client):
     resp = client.options(
         "/analyze",
         headers={
-            "Origin": "https://rakeshreddy26-bit.github.io",
+            "Origin": "https://skill-vector.com",
             "Access-Control-Request-Method": "POST",
         },
     )
-    assert resp.headers.get("access-control-allow-origin") == "https://rakeshreddy26-bit.github.io"
+    assert resp.headers.get("access-control-allow-origin") == "https://skill-vector.com"
 
 
 def test_cors_blocks_unknown_origin(client):
