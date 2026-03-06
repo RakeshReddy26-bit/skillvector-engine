@@ -28,8 +28,8 @@ const TECH_STACK = [
   "Neo4j",
   "LangChain",
   "Sentence Transformers",
-  "124 Pytest Tests",
-  "Render (Free Tier)",
+  "152 Pytest Tests",
+  "Railway (Production)",
 ];
 
 export default function Home() {
@@ -165,7 +165,7 @@ export default function Home() {
           <p className="mt-5 font-mono text-sm text-muted max-w-lg mx-auto leading-relaxed animate-fade-up" style={{ animationDelay: "0.2s" }}>
             Deterministic skill gap analysis. Real evidence projects.
             Prerequisite-ordered learning paths. Built on Claude Sonnet.
-            124 tests. Open source.
+            152 tests. Open source.
           </p>
         </section>
 
@@ -198,7 +198,7 @@ export default function Home() {
         {/* Stats Bar */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 py-10 border-t border-b border-white/10 mb-16">
           {[
-            ["124", "AUTOMATED TESTS"],
+            ["152", "AUTOMATED TESTS"],
             ["32", "SKILLS IN DAG"],
             ["55", "INDEXED JOBS"],
             ["7", "PIPELINE STEPS"],
