@@ -157,5 +157,13 @@ async def atlas_health(auth=Depends(verify_atlas)):
     return {
         "status": "ok",
         "message": "SkillVector ready for Atlas pipeline",
-        "endpoints": ["/automation/ingest-jobs", "/automation/trend-update", "/automation/daily-insight"]
+        "endpoints": [
+            "/automation/ingest-jobs",
+            "/automation/trend-update",
+            "/automation/daily-insight",
+            "/trends/report",
+            "/trends/skill/{name}",
+            "/trends/skills",
+            "/trends/snapshot",
+        ]
     }

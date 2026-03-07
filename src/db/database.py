@@ -68,6 +68,40 @@ def init_db() -> None:
                 metadata TEXT,
                 created_at TEXT DEFAULT (datetime('now'))
             );
+
+            -- Skill trend tracking: one row per skill per analysis
+            CREATE TABLE IF NOT EXISTS skill_trend_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                skill_name TEXT NOT NULL,
+                match_score REAL NOT NULL,
+                target_role TEXT NOT NULL,
+                created_at TEXT DEFAULT (datetime('now'))
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_ste_skill
+                ON skill_trend_events(skill_name);
+
+            CREATE INDEX IF NOT EXISTS idx_ste_created
+                ON skill_trend_events(created_at);
+
+            -- Weekly aggregated snapshots for fast trend queries
+            CREATE TABLE IF NOT EXISTS skill_trend_snapshots (
+                id TEXT PRIMARY KEY,
+                week_start TEXT NOT NULL,
+                skill_name TEXT NOT NULL,
+                gap_frequency INTEGER NOT NULL DEFAULT 0,
+                avg_match_score REAL NOT NULL DEFAULT 0,
+                top_roles TEXT NOT NULL DEFAULT '[]',
+                trend_direction TEXT NOT NULL DEFAULT 'stable',
+                created_at TEXT DEFAULT (datetime('now')),
+                UNIQUE(week_start, skill_name)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_sts_week
+                ON skill_trend_snapshots(week_start);
+
+            CREATE INDEX IF NOT EXISTS idx_sts_skill
+                ON skill_trend_snapshots(skill_name);
         """)
         conn.commit()
         # v3 schema migration: add plan/stripe columns (idempotent)

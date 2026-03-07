@@ -25,6 +25,7 @@ from api.models import AnalyzeRequest, AnalyzeResponse, ErrorResponse, HealthRes
 from api.stripe_routes import router as stripe_router
 from src.routes.automation import router as automation_router
 from src.routes.reports import router as reports_router
+from src.routes.trends import router as trends_router
 from src.db.database import init_db
 from src.health import check_health
 from src.pipeline.full_pipeline import SkillVectorPipeline
@@ -97,6 +98,7 @@ app.include_router(dashboard_router)
 app.include_router(stripe_router)
 app.include_router(automation_router)
 app.include_router(reports_router)
+app.include_router(trends_router)
 
 
 @app.get("/health", response_model=HealthResponse)

@@ -1,11 +1,17 @@
 """
 Tracks daily analysis stats for Scribe agent content creation.
-In-memory store — resets daily. No database needed.
+Now persists to SQLite so data survives server restarts.
+Also keeps in-memory store for fast reads within the same day.
 """
 
 import asyncio
+import logging
 from datetime import date
 from collections import Counter
+
+from src.db.database import get_connection
+
+logger = logging.getLogger(__name__)
 
 _store = {
     "date": date.today().isoformat(),
@@ -15,6 +21,24 @@ _store = {
     "trending_skills": []
 }
 _lock = asyncio.Lock()
+
+
+def _persist_skill_gaps(match_score: float, missing_skills: list, target_role: str) -> None:
+    """Write individual skill gap events to SQLite (sync, called under lock)."""
+    try:
+        conn = get_connection()
+        try:
+            for s in (missing_skills or []):
+                name = s.get("skill", s) if isinstance(s, dict) else s
+                conn.execute(
+                    "INSERT INTO skill_trend_events (skill_name, match_score, target_role) VALUES (?, ?, ?)",
+                    (str(name), float(match_score), str(target_role)),
+                )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        logger.warning("Failed to persist skill trend event: %s", e)
 
 
 async def record_analysis(match_score: int, missing_skills: list, target_role: str):
@@ -34,6 +58,9 @@ async def record_analysis(match_score: int, missing_skills: list, target_role: s
         for s in (missing_skills or []):
             name = s.get("skill", s) if isinstance(s, dict) else s
             _store["skill_gaps"].append(name)
+
+        # Persist to SQLite for long-term trend tracking
+        _persist_skill_gaps(match_score, missing_skills, target_role)
 
 
 async def update_trending_skills(skills: list[str]):
